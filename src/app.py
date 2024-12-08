@@ -54,7 +54,7 @@ class Picture:
         imageio.seek(0)
         return send_file(imageio, mimetype="image/png")
 
-    @app.route("/api/config", method=["POST"])
+    @app.route("/api/config", methods=["POST"])
     def setconfig():
         ...
 
