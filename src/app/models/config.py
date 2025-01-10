@@ -1,14 +1,21 @@
 import os
 import json
 import threading
-
+import time
+from uuid import uuid4
+import app.models.database as db
 
 class Config():
-    def __init__(self, filepath, init={}):
+    def __init__(self, filepath, id, init={}):
+        self.cid=id
         self.path = filepath
+        
         if not os.path.exists(self.path):
             with open(self.path, "w") as f:
                 f.write(json.dumps(init))
+            with db.db.connect() as (con,cur):
+                cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",(self.cid,str(init),time.strftime("%Y-%m-%d-%H-%M-%S")))
+        
         with open(self.path, "r") as f:
             self.data = json.loads(f.read())
         self.lock = threading.Lock()
@@ -21,10 +28,12 @@ class Config():
         self.data = newdata
         with open(self.path, "w") as f:
             f.write(json.dumps(self.data))
+        with db.db.connect() as (con,cur):
+            cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",(self.cid,str(newdata),time.strftime("%Y-%m-%d-%H-%M-%S")))
         self.lock.release()
 
 
-picconfig = Config("./configs/pic.json", {
+picconfig = Config("./configs/pic.json", 0,{
     "escape": True,
     "screens": [
         [

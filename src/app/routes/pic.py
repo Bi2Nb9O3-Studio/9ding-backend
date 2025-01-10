@@ -1,8 +1,9 @@
 import flask
-from flask import request, send_file
+from flask import jsonify, request, send_file
 from io import BytesIO
 import app.models.database as database
 import app.utils as utils
+import app.models.config as config
 
 blueprint=flask.Blueprint("pic", __name__)
 
@@ -52,6 +53,12 @@ def get_image(id):
     return send_file(imageio, mimetype="image/png")
 
 
-@blueprint.route("/api/config", methods=["POST"])
+@blueprint.route("/api/config", methods=["POST","PUT"])
 def setconfig():
-    ...
+    data=request.get_json()
+    config.picconfig.set(data)
+    return jsonify({"message":"success","status":200}),200
+
+@blueprint.route("/api/config", methods=["GET"])
+def getconfig():
+    return jsonify(config.picconfig.data),200

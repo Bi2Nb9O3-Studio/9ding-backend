@@ -27,8 +27,14 @@ class Database():
         return Connection(self.path, self.lock)
     def init(self):
         with self.connect() as (con, cur):
+            #images
             cur.execute(
-                "CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, name TEXT, category TEXT, teacher TEXT, image TEXT)")
+                "CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT, name TEXT, category TEXT, teacher TEXT, image TEXT)"
+            )
+            #config-history
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS cfg_history (id INTEGER PRIMARY KEY AUTOINCREMENT, cid INTEGER, data TEXT, time TEXT)"
+            )
 
 
 
