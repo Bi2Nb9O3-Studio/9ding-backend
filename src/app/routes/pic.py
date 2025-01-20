@@ -133,3 +133,9 @@ def getmetadata():
 @blueprint.route("/api/model.glb", methods=["GET"])
 def getmodel():
     return send_file(os.path.abspath("./models/model.glb"), mimetype="model/glb")
+
+@blueprint.route("/api/model.glb", methods=["POST", "PUT"])
+def setmodel():
+    f = request.files["model"]
+    f.save(os.path.abspath("./models/model.glb"))
+    return jsonify({"message": "success", "status": 200}), 200

@@ -189,3 +189,32 @@ picconfig = Config("./configs/pic.json", 0,{
     },
     "backgroundColor": "#c7e8ff"
 })
+
+generalconfig = Config("./configs/general.json", 1, {
+    "camera": {
+        "FOV": 75,
+        "position": {
+            "x": 3,
+            "y": 2,
+            "z": -0.5
+        },
+        "near": 0.1,
+        "far": 1000
+    },
+    "spaceBoundaries": {
+        "minX": 0.35,
+        "maxX": 16.25,
+        "minZ": -6.63,
+        "maxZ": -0.5
+    },
+    "modelURL": "http://localhost:5500/local-site/api/model.glb",
+    "divElementID": "cav",
+    "moveDistance": 0.05,
+    "handlers": [
+        {
+            "type": "image",
+            "backendurl": "http://localhost:5500/local-site/api/"
+        }
+    ]
+}
+)
