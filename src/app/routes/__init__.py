@@ -15,6 +15,6 @@ for _, module_name, ispkg in pkg_list:
     for name in module_attrs:
       var_obj = getattr(module, name)
       if isinstance(var_obj, Blueprint):
-        if app_dict.get(name) is None:
-          app_dict[name] = var_obj
+        if app_dict.get(module_name) is None:
+          app_dict[module_name] = var_obj
           built_blueprint.register_blueprint(var_obj)
