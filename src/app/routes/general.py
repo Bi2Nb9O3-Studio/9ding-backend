@@ -1,3 +1,4 @@
+import json
 import flask
 import app.models.config as config
 blueprint = flask.Blueprint("general", __name__)
@@ -12,4 +13,5 @@ def setconfig():
 
 @blueprint.route("/config.json", methods=["GET"])
 def getconfig():
-    return flask.jsonify(config.generalconfig.data), 200
+    resp = json.dumps(config.generalconfig.data)
+    return flask.jsonify(json.loads(resp.replace("##SITEURL##", config.panelconfig.data["site-url"]))), 200

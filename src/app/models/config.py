@@ -207,14 +207,18 @@ generalconfig = Config("./configs/general.json", 1, {
         "minZ": -6.63,
         "maxZ": -0.5
     },
-    "modelURL": "http://localhost:5500/local-site/api/model.glb",
+    "modelURL": "##SITEURL##/api/model.glb",
     "divElementID": "cav",
     "moveDistance": 0.05,
     "handlers": [
         {
             "type": "image",
-            "backendurl": "http://localhost:5500/local-site/api/"
+            "backendurl": "##SITEURL##/api/"
         }
     ]
 }
 )
+
+panelconfig = Config("./configs/panel.json", 2, {
+    "site-url":"http://localhost:5000"
+})
