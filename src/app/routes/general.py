@@ -1,10 +1,12 @@
 import json
 import flask
 import app.models.config as config
+import app.auth as auth
 blueprint = flask.Blueprint("general", __name__)
 
 
 @blueprint.route("/config.json", methods=["POST", "PUT"])
+@auth.login_required
 def setconfig():
     data = flask.request.get_json()
     config.generalconfig.set(data)

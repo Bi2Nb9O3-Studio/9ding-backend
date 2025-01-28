@@ -1,6 +1,7 @@
+from hashlib import sha256
 import sqlite3
 import threading
-
+import app.models.config as config
 
 class Connection():
     def __init__(self, path, lock: threading.Lock):
@@ -34,6 +35,13 @@ class Database():
             #config-history
             cur.execute(
                 "CREATE TABLE IF NOT EXISTS cfg_history (id INTEGER PRIMARY KEY AUTOINCREMENT, cid INTEGER, data TEXT, time TEXT)"
+            )
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
+            )
+            #insert default user if note exists
+            cur.execute(
+                f"INSERT INTO users values (1, 'admin', 'e60da41b2603a837ac93532e4cc11a68f99b8209e8fdd5b7643a9ebc5028784e') ON CONFLICT DO NOTHING"
             )
 
 

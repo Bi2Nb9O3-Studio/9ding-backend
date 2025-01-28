@@ -1,10 +1,13 @@
 from flask import Blueprint, request, jsonify
 import app.models.config as config
+import app.auth as auth
+from app.routes.admin import login
 
 blueprint = Blueprint("panel", __name__)
 
 
 @blueprint.route("/panel/config", methods=["POST", "PUT"])
+@login
 def setconfig():
     data = request.get_json()
     config.panelconfig.set(data)

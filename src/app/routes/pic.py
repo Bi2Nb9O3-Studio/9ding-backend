@@ -5,11 +5,13 @@ from io import BytesIO
 import app.models.database as database
 import app.utils as utils
 import app.models.config as config
+import app.auth as auth
 
 blueprint = flask.Blueprint("pic", __name__)
 
 
 @blueprint.route("/api/content/new", methods=["POST", "PUT"])
+@auth.login_required
 def post_image():
     '''
     POST /api/content/new
@@ -55,6 +57,7 @@ def get_image(id):
 
 
 @blueprint.route("/api/content/<int:id>", methods=["POST", "PUT"])
+@auth.login_required
 def modify_image(id):
     d = request.get_json()
     try:
@@ -74,6 +77,7 @@ def modify_image(id):
 
 
 @blueprint.route("/api/content/<int:id>", methods=["DELETE"])
+@auth.login_required
 def delete_image(id):
     with database.db.connect() as (con, cur):
         cur.execute("DELETE FROM images WHERE id=?", (id,))
@@ -82,6 +86,7 @@ def delete_image(id):
 
 
 @blueprint.route("/api/config", methods=["POST", "PUT"])
+@auth.login_required
 def setconfig():
     data = request.get_json()
     config.picconfig.set(data)
@@ -134,7 +139,9 @@ def getmetadata():
 def getmodel():
     return send_file(os.path.abspath("./models/model.glb"), mimetype="model/glb")
 
+
 @blueprint.route("/api/model.glb", methods=["POST", "PUT"])
+@auth.login_required
 def setmodel():
     f = request.files["model"]
     f.save(os.path.abspath("./models/model.glb"))
