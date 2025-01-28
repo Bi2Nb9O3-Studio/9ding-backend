@@ -1,5 +1,5 @@
 from hashlib import sha256
-
+from functools import wraps
 import flask
 import app.models.database as database
 
@@ -37,6 +37,7 @@ def logined_valid(request:flask.Request):
     return request.cookies.get("verification") == sha256((salt+request.cookies.get("username")+salt).encode()).hexdigest()+salt
 
 def login_required(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if logined_valid(flask.request):
             return func(*args, **kwargs)

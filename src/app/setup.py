@@ -5,7 +5,6 @@ import app.models.config as config
 app1=Flask(__name__)
 app1.register_blueprint(routes.built_blueprint)
 
-
 @app1.after_request
 def after(resp):
     '''

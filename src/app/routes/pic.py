@@ -14,6 +14,7 @@ blueprint = flask.Blueprint("pic", __name__)
 @auth.login_required
 def post_image():
     '''
+    发布新的图片
     POST /api/content/new
     formation:
     ```{
@@ -22,7 +23,7 @@ def post_image():
         "category": "category",
         "work_name": "name",
         "teacher": "teacher"
-    }```
+    }
     '''
     try:
         d = request.get_json()
@@ -34,11 +35,15 @@ def post_image():
         return jsonify({"message": "success", "status": 200, "id": cur.lastrowid}), 200
     except Exception as e:
         return jsonify({"message": "error", "status": 500, "error": str(e)}), 500
-# TODO Auth
+
 
 
 @blueprint.route("/api/content/<int:id>", methods=["GET"])
 def get_image(id):
+    '''
+    获取图片
+    GET /api/content/<id>
+    '''
     with database.db.connect() as (con, cur):
         cur.execute("SELECT * FROM images WHERE id=?", (id,))
         data = cur.fetchone()
@@ -59,6 +64,19 @@ def get_image(id):
 @blueprint.route("/api/content/<int:id>", methods=["POST", "PUT"])
 @auth.login_required
 def modify_image(id):
+    '''
+    修改图片
+    POST /api/content/<id>
+    PUT /api/content/<id>
+    formation:
+    ```{
+        "image": "base64",
+        "stu_name": "name",
+        "category": "category",
+        "work_name": "name",
+        "teacher": "teacher"
+    }
+    '''
     d = request.get_json()
     try:
         # if not exist
@@ -79,6 +97,10 @@ def modify_image(id):
 @blueprint.route("/api/content/<int:id>", methods=["DELETE"])
 @auth.login_required
 def delete_image(id):
+    '''
+    修改图片
+    DELETE /api/content/<id>
+    '''
     with database.db.connect() as (con, cur):
         cur.execute("DELETE FROM images WHERE id=?", (id,))
         con.commit()
@@ -88,6 +110,12 @@ def delete_image(id):
 @blueprint.route("/api/config", methods=["POST", "PUT"])
 @auth.login_required
 def setconfig():
+    '''
+    设置新的配置
+    POST /api/config
+    PUT /api/config
+    data: newdata
+    '''
     data = request.get_json()
     config.picconfig.set(data)
     return jsonify({"message": "success", "status": 200}), 200
@@ -95,22 +123,18 @@ def setconfig():
 
 @blueprint.route("/api/config", methods=["GET"])
 def getconfig():
+    '''
+    获取图片配置
+    GET /api/config
+    '''
     return jsonify(config.picconfig.data), 200
 
 
 @blueprint.route("/api/metadata", methods=["GET"])
 def getmetadata():
     '''
-    return list,for each:
-    {
-        "url": "./content/<id>",
-        "info": {
-            "stu_name": ...,
-            "category": ...,
-            "work_name": ...,
-            "teacher": ...
-        }
-    }
+    获取图片元数据
+    GET /api/metadata
     '''
     try:
         with database.db.connect() as (con, cur):
@@ -137,12 +161,21 @@ def getmetadata():
 
 @blueprint.route("/api/model.glb", methods=["GET"])
 def getmodel():
+    '''
+    获取模型
+    GET /api/model.glb
+    '''
     return send_file(os.path.abspath("./models/model.glb"), mimetype="model/glb")
 
 
 @blueprint.route("/api/model.glb", methods=["POST", "PUT"])
 @auth.login_required
 def setmodel():
+    '''
+    设置模型
+    POST /api/model.glb
+    PUT /api/model.glb
+    '''
     f = request.files["model"]
     f.save(os.path.abspath("./models/model.glb"))
     return jsonify({"message": "success", "status": 200}), 200
