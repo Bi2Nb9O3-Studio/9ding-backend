@@ -21,3 +21,17 @@ def bundle():
 @blueprint.route("/api/content/empty", methods=["GET"])
 def empty():
     return send_file("static/empty.png")
+
+@blueprint.route("/admin/login", methods=["GET"])
+def login():
+    '''
+    GET /admin/index
+    '''
+    return send_file("static/admin/login.html")
+
+@blueprint.route("/admin/pic", methods=["GET"])
+def pic():
+    '''
+    GET /admin/pic
+    '''
+    return send_file("static/admin/pic.html")

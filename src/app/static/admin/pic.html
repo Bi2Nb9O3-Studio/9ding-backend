@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>九鼎后台</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #ADD8FB;
+                overflow: scroll;
+            }
+            nav {
+                display: block;
+                position: fixed;
+                top: 3%;
+                left: 3%;
+                width: 150px;
+                height: 94%;
+                background-color: #fff;
+                border-radius: 20px;
+            }
+            item{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            h1 {
+                text-align: center;
+                color: #333;
+            }
+            .line {
+                width: 90%;
+                height: 5px;
+                background-color: #ddd;
+                margin-left: 5%;
+            }
+            a{
+                display: block;
+                text-align: center;
+                color: #333;
+                text-decoration: none;
+                padding: 10px;
+                cursor: pointer;
+                font-weight: bolder;
+                margin-left: 4%;
+                margin-right: 4%;
+                border-radius: 10px;
+            }
+            a:hover{
+                background-color: #5A8ACB;
+                color: #ddd;
+            }
+            a[actived]{
+                background-color: #7AABEF;
+                color: #fff;
+            }
+            #container{
+                background-color: #fff;
+                border-radius: 20px;
+                display: block;
+                position: relative;
+                top: 3vh;
+                left: calc(150px + 5vw);
+                width: calc(96vw - 190px);
+                min-height: 94vh;
+                height: auto;
+            }
+            .title{
+                text-align: center;
+                font-size: 30px;
+                font-weight: bolder;
+                padding: 20px;
+            }
+
+            table{
+                width: 90%;
+                border-collapse: collapse;
+                margin-left: 5%;
+                margin-top: 10px;
+            }
+            table tr td{
+                border: 1px solid #ddd;
+                padding: 10px;
+            }
+            table thead td{
+                font-weight: bolder;
+            }
+
+            #pageselection{
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 80%;
+            }
+
+            .arror{
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .arror:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+
+            .arror[disabled]{
+                background-color: #ddd;
+                color: #fff;
+                cursor: not-allowed;
+            }
+
+            .pages{
+                display: block;
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .pages:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+
+            .pages[actived]{
+                background-color: #7AABEF;
+                color: #fff;
+            }
+
+            .ellipsis{
+                display: block;
+                width: 30px;
+                height: 30px;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            #new{
+                display: block;
+                margin: auto;
+                margin-top: 20px;
+                width: 100px;
+                height: 30px;
+                background-color: #5A8ACB;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+        </style>
+    </head>
+    <body>
+        <nav>
+            <item><h1>九鼎后台</h1></item>
+            <item>
+                <div class="line"></div>
+            </item>
+            <item>
+                <a actived href="/admin/pic">图片管理</a>
+            </item>
+            <item>
+                <a>用户管理</a>
+            </item>
+            <item>
+                <a>配置管理</a>
+            </item>
+        </nav>
+        <div id="container">
+            <div class="title">图片管理</div>
+            <div class="line"></div>
+            <div style="display: flex; justify-content: space-between;width: 90%; margin-left: 5%;">
+                <div id="pageselection">
+                    <div class="arror">←</div>
+                    <!-- pages here -->
+                    <div class="arror">→</div>
+                </div>
+                <button id="new">上传新图片</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>编号</td>
+                        <td>图片</td>
+                        <td>作者</td>
+                        <td>标题</td>
+                        <td>类别</td>
+                        <td>指导老师</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </body>
+    <script></script>
+</html>

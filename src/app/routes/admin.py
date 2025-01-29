@@ -1,6 +1,6 @@
 import os
 import flask
-from flask import jsonify, make_response, request, send_file
+from flask import jsonify, make_response, redirect, request, send_file
 from io import BytesIO
 import app.models.database as database
 import app.auth as auth
@@ -18,10 +18,11 @@ def login():
         "password": "password"
     }
     '''
-    data = request.get_json()
-    if not auth.verify_password(data["username"], data["password"]):
-        return jsonify({"error": "login failed"}), 401
-    response = jsonify({"success": "login success"})
+    data = request.form
+    valid = auth.verify_password(data["username"], data["password"])
+    if not valid[0]:
+        return redirect("/admin/login?failed=true&cause="+valid[1])
+    response = redirect("/admin/pic")
     auth.set_logined_status(data["username"], response)
     return response
 
@@ -86,3 +87,4 @@ def change_password():
     data = request.get_json()
     auth.change_password(data["username"], data["password"])
     return jsonify({"success": "change password success"})
+

@@ -1,18 +1,19 @@
 from hashlib import sha256
 from functools import wraps
+from typing import Tuple
 import flask
 import app.models.database as database
 
 salt = "d39d977837414790d42ecd351f59da887d7c41f1a62b5463475bf1c6dc1bd556"
 
-def verify_password(username:str, password:str):
+def verify_password(username:str, password:str) -> Tuple[bool, str]:
     #get the password of user
     with database.db.connect() as (con, cur):
         cur.execute(f"SELECT password FROM users WHERE username='{username}'")
         result = cur.fetchone()
         if result is None:
-            return False
-        return result[0] == sha256((salt+password).encode()).hexdigest()
+            return (False, "用户不存在")
+        return (result[0] == sha256((salt+password).encode()).hexdigest(),"密码不正确")
 
 
 def add_user(username: str, password: str):
