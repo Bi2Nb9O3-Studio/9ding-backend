@@ -35,6 +35,8 @@ def set_logout_status(respone:flask.Response):
     respone.set_cookie("username","")
     respone.set_cookie("verification","")
 def logined_valid(request:flask.Request):
+    if request.cookies.get("username")==None or request.cookies.get("verification") == None:
+        return False
     return request.cookies.get("verification") == sha256((salt+request.cookies.get("username")+salt).encode()).hexdigest()+salt
 
 def login_required(func):

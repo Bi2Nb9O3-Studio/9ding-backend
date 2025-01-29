@@ -25,16 +25,13 @@ def post_image():
         "teacher": "teacher"
     }
     '''
-    try:
-        d = request.get_json()
-        # save into database
-        with database.db.connect() as (con, cur):
-            cur.execute("INSERT INTO images (author, name, category, teacher, image) VALUES (?,?,?,?,?)",
-                        (d["stu_name"], d["work_name"], d["category"], d["teacher"], d["image"]))
-            con.commit()
-        return jsonify({"message": "success", "status": 200, "id": cur.lastrowid}), 200
-    except Exception as e:
-        return jsonify({"message": "error", "status": 500, "error": str(e)}), 500
+    d = request.get_json()
+    # save into database
+    with database.db.connect() as (con, cur):
+        cur.execute("INSERT INTO images (author, name, category, teacher, image) VALUES (?,?,?,?,?)",
+                    (d["stu_name"], d["work_name"], d["category"], d["teacher"], d["image"]))
+        con.commit()
+    return jsonify({"message": "success", "status": 200, "id": cur.lastrowid}), 200
 
 
 
@@ -138,12 +135,43 @@ def getmetadata():
     '''
     try:
         with database.db.connect() as (con, cur):
-            cur.execute("SELECT * FROM images")
+            cur.execute("SELECT id,author,name,category,teacher FROM images")
             data = cur.fetchall()
         resp = []
         for i in data:
             # 转义
 
+            resp.append({
+                "url": f"./content/{i[0]}",
+                "info": {
+                    "stu_name": i[1],
+                    "category": i[3],
+                    "work_name": i[2],
+                    "teacher": i[4]
+                }
+            })
+        return jsonify(resp), 200
+        # return jsonify(data),200
+    except Exception as e:
+        return jsonify({"message": "error", "status": 500, "error": str(e)}), 500
+    # return jsonify(data), 200
+
+
+@blueprint.route("/api/metadata/slice", methods=["GET"])
+def getmetadatasliced():
+    '''
+    获取图片元数据
+    GET /api/metadata
+    '''
+    try:
+        page = int(request.args.get("page", 1))
+        limit = int(request.args.get("limit", 10))
+        with database.db.connect() as (con, cur):
+            cur.execute(f"SELECT * FROM images LIMIT {limit} OFFSET {(page-1)*limit}")
+            data = cur.fetchall()
+        resp = []
+        for i in data:
+            # 转义
             resp.append({
                 "url": f"./content/{i[0]}",
                 "info": {

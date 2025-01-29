@@ -95,28 +95,6 @@
                 width: 80%;
             }
 
-            .arror{
-                width: 30px;
-                height: 30px;
-                background-color: #ddd;
-                text-align: center;
-                line-height: 30px;
-                border-radius: 50%;
-                cursor: pointer;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-
-            .arror:hover{
-                background-color: #5A8ACB;
-                color: #fff;
-            }
-
-            .arror[disabled]{
-                background-color: #ddd;
-                color: #fff;
-                cursor: not-allowed;
-            }
 
             .pages{
                 display: block;
@@ -165,6 +143,46 @@
                 cursor: pointer;
             }
 
+            #newpop{
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 100;
+                justify-content: center;
+            }
+
+            #newcontainer{
+                display: block;
+                width: 75%;
+                height: 75%;
+                background-color: #fff;
+                margin-top: 7.5vh;
+                border-radius: 20px;
+                padding: 20px;
+            }
+            #closebtn{
+                display: block;
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                border-radius: 50%;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+            }
+
+            #closebtn:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+
+
+
         </style>
     </head>
     <body>
@@ -188,11 +206,8 @@
             <div class="line"></div>
             <div style="display: flex; justify-content: space-between;width: 90%; margin-left: 5%;">
                 <div id="pageselection">
-                    <div class="arror">←</div>
-                    <!-- pages here -->
-                    <div class="arror">→</div>
                 </div>
-                <button id="new">上传新图片</button>
+                <button id="new" onclick="document.getElementById('newpop').style.display='flex'">上传新图片</button>
             </div>
             <table>
                 <thead>
@@ -206,8 +221,177 @@
                         <td>操作</td>
                     </tr>
                 </thead>
+                <tbody></tbody>
             </table>
         </div>
+        <div id="newpop">
+            <div id="newcontainer">
+                <button id="closebtn" onclick="document.getElementById('newpop').style.display='none';">X</button>
+                <h1>上传新图片</h1>
+                <div action="/api/content" method="post" enctype="multipart/form-data">
+                    <label for="file">图片</label>
+                    <input type="file" name="file" id="file">
+                    <br>
+                    <label for="stu_name">作者</label>
+                    <input type="text" name="stu_name" id="stu_name">
+                    <br>
+                    <label for="work_name">标题</label>
+                    <input type="text" name="work_name" id="work_name">
+                    <br>
+                    <label for="category">类别</label>
+                    <input type="text" name="category" id="category">
+                    <br>
+                    <label for="teacher">指导老师</label>
+                    <input type="text" name="teacher" id="teacher">
+                    <br>
+                    <button id="uploadnew">上传</button>
+                </div>
+            </div>
+        </div>
     </body>
-    <script></script>
+    <script>
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                // 创建一个新的 FileReader 对象
+                const reader = new FileReader();
+                // 读取 File 对象
+                reader.readAsDataURL(file);
+                // 加载完成后
+                reader.onload = function () {
+                // 将读取的数据转换为 base64 编码的字符串
+                const base64String = reader.result;
+                // 解析为 Promise 对象，并返回 base64 编码的字符串
+                resolve(base64String);
+                };
+            
+                // 加载失败时
+                reader.onerror = function () {
+                    reject(new Error("Failed to load file"));
+                };
+            });
+        }
+
+        const delete_item = id => {
+            if(confirm("确定删除吗？")){
+                fetch("/api/content/"+id, {
+                    method: "DELETE"
+                }).then(res => {
+                    if (res.status === 200) {
+                        alert("删除成功");
+                        window.location.reload();
+                    } else {
+                        alert("删除失败");
+                    }
+                });
+            }
+        }
+
+        const render_table = data => {
+                let table = document.querySelector("tbody");
+                table.innerHTML = "";
+                data.forEach((item, index) => {
+                    let tr = document.createElement("tr");
+                    let tmp=item.url.split("/")
+                    let id=tmp[tmp.length-1]
+                    tr.innerHTML = `
+                        <td>${id}</td>
+                        <td><img src="${item.url.replace(".","/api")}" style="width: 100px; height: 100px;"></td>
+                        <td>${item.info.stu_name}</td>
+                        <td>${item.info.work_name}</td>
+                        <td>${item.info.category}</td>
+                        <td>${item.info.teacher}</td>
+                        <td><button onclick="delete_item(${id})">删除</button></td>
+                    `;
+                    table.appendChild(tr);
+                })};
+        document.querySelector("#uploadnew").onclick = () => {
+            let file = document.querySelector("#file").files[0];
+            let stu_name = document.querySelector("#stu_name").value;
+            let work_name = document.querySelector("#work_name").value;
+            let category = document.querySelector("#category").value;
+            let teacher = document.querySelector("#teacher").value;
+            fileToBase64(file).then(base64 => {
+                fetch("/api/content/new", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "image": base64,
+                        "stu_name":stu_name,
+                        "work_name":work_name,
+                        "category":category,
+                        "teacher":teacher
+                    })
+                }).then(res => {
+                    if (res.status === 200) {
+                        alert("上传成功");
+                        window.location.reload();
+                    } else {
+                        alert("上传失败");
+                    }
+                });
+            });
+        };
+
+        fetch("/api/metadata")
+            .then(res => res.json())
+            .then(data => {
+                //limit per page:10
+                //ellipsis when overflow
+                let pages = Math.ceil(data.length / 10);
+                let current_page = 1;
+                let current_data = data.slice(0, 10);
+                render_table(current_data);
+                let pageselection = document.querySelector("#pageselection");
+
+                const renderPagination = () => {
+                    pageselection.innerHTML = "";
+                    if (pages <= 8) {
+                        for (let i = 1; i <= pages; i++) {
+                            createPageButton(i);
+                        }
+                    } else {
+                        createPageButton(1);
+                        if (current_page > 4) {
+                            createEllipsis();
+                        }
+                        let start = Math.max(2, current_page - 1);
+                        let end = Math.min(pages - 1, current_page + 1);
+                        for (let i = start; i <= end; i++) {
+                            createPageButton(i);
+                        }
+                        if (current_page < pages - 3) {
+                            createEllipsis();
+                        }
+                        createPageButton(pages);
+                    }
+                };
+
+                const createPageButton = (i) => {
+                    let page = document.createElement("div");
+                    page.className = "pages";
+                    page.innerText = i;
+                    if (i === current_page) {
+                        page.setAttribute("actived", "");
+                    }
+                    page.onclick = () => {
+                        current_page = i;
+                        current_data = data.slice((i - 1) * 10, i * 10);
+                        render_table(current_data);
+                        renderPagination();
+                    };
+                    pageselection.appendChild(page);
+                };
+
+                const createEllipsis = () => {
+                    let ellipsis = document.createElement("div");
+                    ellipsis.className = "ellipsis";
+                    ellipsis.innerText = "...";
+                    pageselection.appendChild(ellipsis);
+                };
+
+                renderPagination();
+            });
+    </script>
 </html>
