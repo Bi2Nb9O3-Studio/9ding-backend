@@ -56,3 +56,11 @@ def config():
     GET /admin/pic
     '''
     return send_file("static/admin/config.html")
+
+@blueprint.route("/admin/cfghis", methods=["GET"])
+@auth.login_required
+def cfghis():
+    '''
+    GET /admin/pic
+    '''
+    return send_file("static/admin/config_history.html")

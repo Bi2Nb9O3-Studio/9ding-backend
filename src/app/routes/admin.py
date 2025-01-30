@@ -123,3 +123,36 @@ def users():
     '''
     return jsonify(auth.all_users())
 
+@blueprint.route("/admin/cfghis", methods=["POST"])
+@auth.login_required
+def cfghis():
+    '''
+    GET /admin/cfghis
+    `need login`
+    '''
+    with database.db.connect() as (con, cur):
+        cur.execute("SELECT * FROM cfg_history")
+        result = cur.fetchall()
+    return jsonify(result)
+
+@blueprint.route("/admin/revert_config", methods=["POST"])
+@auth.login_required
+def revert_config():
+    '''
+    POST /admin/revert_config
+    data:{
+        "id": "id"
+    }
+    `need login`
+    '''
+    map=[
+        config.picconfig,
+        config.generalconfig,
+        config.panelconfig
+    ]
+    data = request.get_json()
+    with database.db.connect() as (con, cur):
+        cur.execute(f"SELECT * FROM cfg_history WHERE id={data['id']}")
+        result = cur.fetchone()
+    map[result[1]].set(result[2])
+    return jsonify({"status":200, "msg":"revert success"})
