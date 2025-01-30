@@ -2,6 +2,7 @@ import os
 import flask
 from flask import jsonify, make_response, request, send_file
 from io import BytesIO
+from app import auth
 import app.models.database as database
 import app.utils as utils
 import app.models.config as config
@@ -30,8 +31,18 @@ def login():
     return send_file("static/admin/login.html")
 
 @blueprint.route("/admin/pic", methods=["GET"])
+@auth.login_required
 def pic():
     '''
     GET /admin/pic
     '''
     return send_file("static/admin/pic.html")
+
+
+@blueprint.route("/admin/users", methods=["GET"])
+@auth.login_required
+def users():
+    '''
+    GET /admin/pic
+    '''
+    return send_file("static/admin/users.html")

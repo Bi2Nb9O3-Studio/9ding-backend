@@ -20,24 +20,26 @@ def add_user(username: str, password: str):
     with database.db.connect() as (con, cur):
         cur.execute(f"INSERT INTO users (username, password) VALUES ('{username}', '{sha256((salt+password).encode()).hexdigest()}')")
 
-def remove_user(username: str):
+def remove_user(uid: str):
     with database.db.connect() as (con, cur):
-        cur.execute(f"DELETE FROM users WHERE username='{username}'")
+        cur.execute(f"DELETE FROM users WHERE id='{uid}'")
 
-def change_password(username: str, password: str):
+def change_password(userid: int, password: str):
     with database.db.connect() as (con, cur):
-        cur.execute(f"UPDATE users SET password='{sha256((salt+password).encode()).hexdigest()}' WHERE username='{username}'")
+        cur.execute(
+            f"UPDATE users SET password='{sha256((salt+password).encode()).hexdigest()}' WHERE id='{userid}'")
 
 def set_logined_status(username,respone:flask.Response):
-    respone.set_cookie("username",username)
-    respone.set_cookie("verification",sha256((salt+username+salt).encode()).hexdigest()+salt)
+    respone.set_cookie("username",username,max_age=60*60*24,expires=60*60*24)
+    respone.set_cookie("verification", sha256((salt+username+salt).encode()
+                                              ).hexdigest()+sha256(salt.encode()).hexdigest(), max_age=60*60*24, expires=60*60*24, secure=True)
 def set_logout_status(respone:flask.Response):
     respone.set_cookie("username","")
     respone.set_cookie("verification","")
 def logined_valid(request:flask.Request):
-    if request.cookies.get("username")==None or request.cookies.get("verification") == None:
+    if request.cookies.get("username")==None or request.cookies.get("verification") == None or request.cookies.get("username")=="" or request.cookies.get("verification") == "":
         return False
-    return request.cookies.get("verification") == sha256((salt+request.cookies.get("username")+salt).encode()).hexdigest()+salt
+    return request.cookies.get("verification") == sha256((salt+request.cookies.get("username")+salt).encode()).hexdigest()+sha256(salt.encode()).hexdigest()
 
 def login_required(func):
     @wraps(func)
@@ -47,3 +49,13 @@ def login_required(func):
         else:
             return flask.jsonify({"error": "login required"}), 403
     return wrapper
+
+def all_users():
+    with database.db.connect() as (con, cur):
+        cur.execute("SELECT id,username,password FROM users")
+        return cur.fetchall()
+
+def get_userid(username):
+    with database.db.connect() as (con, cur):
+        cur.execute(f"SELECT id FROM users WHERE username='{username}'")
+        return cur.fetchone()[0]

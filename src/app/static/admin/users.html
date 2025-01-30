@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>九鼎后台</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #ADD8FB;
+                overflow: scroll;
+            }
+            nav {
+                display: block;
+                position: fixed;
+                top: 3%;
+                left: 3%;
+                width: 150px;
+                height: 94%;
+                background-color: #fff;
+                border-radius: 20px;
+            }
+            item{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            h1 {
+                text-align: center;
+                color: #333;
+            }
+            .line {
+                width: 90%;
+                height: 5px;
+                background-color: #ddd;
+                margin-left: 5%;
+            }
+            a{
+                display: block;
+                text-align: center;
+                color: #333;
+                text-decoration: none;
+                padding: 10px;
+                cursor: pointer;
+                font-weight: bolder;
+                margin-left: 4%;
+                margin-right: 4%;
+                border-radius: 10px;
+            }
+            a:hover{
+                background-color: #5A8ACB;
+                color: #ddd;
+            }
+            a[actived]{
+                background-color: #7AABEF;
+                color: #fff;
+            }
+            #container{
+                background-color: #fff;
+                border-radius: 20px;
+                display: block;
+                position: relative;
+                top: 3vh;
+                left: calc(150px + 5vw);
+                width: calc(96vw - 190px);
+                min-height: 94vh;
+                height: auto;
+            }
+            .title{
+                text-align: center;
+                font-size: 30px;
+                font-weight: bolder;
+                padding: 20px;
+            }
+
+            table{
+                width: 90%;
+                border-collapse: collapse;
+                margin-left: 5%;
+                margin-top: 10px;
+            }
+            table tr td{
+                border: 1px solid #ddd;
+                padding: 10px;
+            }
+            table thead td{
+                font-weight: bolder;
+            }
+
+            #pageselection{
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 80%;
+            }
+
+
+            .pages{
+                display: block;
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .pages:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+
+            .pages[actived]{
+                background-color: #7AABEF;
+                color: #fff;
+            }
+
+            .ellipsis{
+                display: block;
+                width: 30px;
+                height: 30px;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            #new{
+                display: block;
+                margin: auto;
+                margin-top: 20px;
+                width: 100px;
+                height: 30px;
+                background-color: #5A8ACB;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            #pop{
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 100;
+                justify-content: center;
+            }
+
+            .newcontainer{
+                display: block;
+                width: 75%;
+                height: 75%;
+                background-color: #fff;
+                margin-top: 7.5vh;
+                border-radius: 20px;
+                padding: 20px;
+            }
+            #closebtn{
+                display: block;
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                border-radius: 50%;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+                text-align: center;
+                line-height: 25px;
+            }
+
+            #closebtn:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+
+            form{
+                display: block;
+                margin: auto;
+                width: 80%;
+            }
+
+            label{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            input,select{
+                display: block;
+                width: 100%;
+                height: 30px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 5px;
+            }
+
+            
+
+
+
+        </style>
+    </head>
+    <body>
+        <nav>
+            <item><h1>九鼎后台</h1></item>
+            <item>
+                <div class="line"></div>
+            </item>
+            <item>
+                <a href="/admin/pic">图片管理</a>
+            </item>
+            <item>
+                <a actived href="/admin/users">用户管理</a>
+            </item>
+            <item>
+                <a>配置管理</a>
+            </item>
+        </nav>
+        <div id="container">
+            <div class="title">用户管理</div>
+            <div class="line"></div>
+            <div style="display: flex; justify-content: space-between;width: 90%; margin-left: 5%;">
+                <div id="pageselection">
+                </div>
+                <button id="new" onclick="newUser()">新建用户</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>编号</td>
+                        <td>用户名</td>
+                        <td>密码哈希</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="pop" style="display: none;">
+                <button id="closebtn" onclick="document.getElementById('pop').style.display='none'">X</button>
+            <div id="pwd" class="newcontainer" style="display: none;">
+                <div class="title">修改密码</div>
+                <div class="line"></div>
+                <form id="pwdform">
+                    <label for="userid">用户</label>
+                    <select name="userid" id="userid">
+                    </select>
+                    <br>
+                    <label for="password">新密码</label>
+                    <input type="password" name="newpassword" id="newpassword" placeholder="新密码">
+                    <br>
+                    <input type="submit" value="提交">
+                    <script>
+                        function newUser(){
+                            document.getElementById('pop').style.display = 'flex';
+                            document.getElementById('pwd').style.display = 'none';
+                            document.getElementById('newuser').style.display = 'block';
+                        }
+                        document.querySelector('#pwdform').onsubmit = function(e){
+                            e.preventDefault();
+                            let userid = document.querySelector('#userid').value;
+                            let newpassword = document.querySelector('#newpassword').value;
+                            fetch('/admin/mod_user', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    userid: userid,
+                                    newpassword: newpassword
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if(data.status == "success"){
+                                    alert('修改成功');
+                                    document.getElementById('pop').style.display = 'none';
+                                    window.location.reload();
+                                }else{
+                                    alert('修改失败 因为：' + data.reason);
+                                }
+                            });
+                        }
+                    </script>
+                </form>
+            </div>
+            <div id="newuser" class="newcontainer" style="display: none;">
+                <div class="title">新建用户</div>
+                <div class="lin"></div>
+                <form id="newuserform">
+                    <label for="username">用户名</label>
+                    <input type="text" name="username" id="username" placeholder="用户名">
+                    <br>
+                    <label for="password">密码</label>
+                    <input type="password" name="password" id="password" placeholder="密码">
+                    <br>
+                    <input type="submit" value="提交">
+                    <script>
+                        document.querySelector('#newuser').onsubmit = function(e){
+                            e.preventDefault();
+                            let username = document.querySelector('#username').value;
+                            let password = document.querySelector('#password').value;
+                            fetch('/admin/new_user', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    username: username,
+                                    password: password
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if(data.status == 200){
+                                    alert('新建成功');
+                                    document.getElementById('pop').style.display = 'none';
+                                    window.location.reload();
+                                }else{
+                                    alert('新建失败 因为：' + data.reason);
+                                }
+                            });
+                        }
+                    </script>
+                </form>
+            </div>
+        </div>
+    </body>
+    <script>
+        function changePassword(userid){
+            document.getElementById('pop').style.display = 'flex';
+            document.getElementById('pwd').style.display = 'block';
+            document.getElementById('newuser').style.display = 'none';
+            document.getElementById('userid').value = userid;
+        }
+        //lazy load
+        window.onload = function(){
+            fetch('/admin/users', {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                let tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+                data.forEach((item, index) => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item[0]}</td>
+                        <td>${item[1]}</td>
+                        <td>${item[2]}</td>
+                        <td>
+                            <button onclick="deleteUser(${item[0]})">删除</button>
+                            <button onclick="changePassword(${item[0]})">修改密码</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    let option = document.createElement('option');
+                    option.value = item[0];
+                    option.innerHTML = item[1];
+                    document.querySelector('#userid').appendChild(option);
+                });
+            });
+        }
+        function deleteUser(userid){
+            if(confirm('确定删除吗？\n删除后不可恢复，如果删除当前用户则会登出')){
+                fetch('rm_user', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userid: userid
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status == 200){
+                        alert('删除成功');
+                        window.location.reload();
+                    }else{
+                        alert('删除失败 因为：' + data.reason);
+                    }
+            });
+        }
+        }
+    </script>
+</html>
