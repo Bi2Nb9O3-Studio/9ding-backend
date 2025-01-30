@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>九鼎后台</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #ADD8FB;
+                overflow: scroll;
+            }
+            nav {
+                display: block;
+                position: fixed;
+                top: 3%;
+                left: 3%;
+                width: 150px;
+                height: 94%;
+                background-color: #fff;
+                border-radius: 20px;
+            }
+            item{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            h1 {
+                text-align: center;
+                color: #333;
+            }
+            .line {
+                width: 90%;
+                height: 5px;
+                background-color: #ddd;
+                margin-left: 5%;
+            }
+            a{
+                display: block;
+                text-align: center;
+                color: #333;
+                text-decoration: none;
+                padding: 10px;
+                cursor: pointer;
+                font-weight: bolder;
+                margin-left: 4%;
+                margin-right: 4%;
+                border-radius: 10px;
+            }
+            a:hover{
+                background-color: #5A8ACB;
+                color: #ddd;
+            }
+            a[actived]{
+                background-color: #7AABEF;
+                color: #fff;
+            }
+            #container{
+                background-color: #fff;
+                border-radius: 20px;
+                display: block;
+                position: relative;
+                top: 3vh;
+                left: calc(150px + 5vw);
+                width: calc(96vw - 190px);
+                min-height: 94vh;
+                height: auto;
+            }
+            .title{
+                text-align: center;
+                font-size: 30px;
+                font-weight: bolder;
+                padding: 20px;
+            }
+            .title1{
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                padding: 20px;
+            }
+            .title2{
+                text-align: center;
+                font-size: 15px;
+                font-weight: normal;
+                padding: 20px;
+            }
+
+            table{
+                width: 90%;
+                border-collapse: collapse;
+                margin-left: 5%;
+                margin-top: 10px;
+            }
+            table tr td{
+                border: 1px solid #ddd;
+                padding: 10px;
+            }
+            table thead td{
+                font-weight: bolder;
+            }
+
+            #pageselection{
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+                width: 80%;
+            }
+
+
+            .pages{
+                display: block;
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                text-align: center;
+                line-height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .pages:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+
+            .pages[actived]{
+                background-color: #7AABEF;
+                color: #fff;
+            }
+
+            #new{
+                display: block;
+                margin: auto;
+                margin-top: 20px;
+                width: 100px;
+                height: 30px;
+                background-color: #5A8ACB;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            #pop{
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 100;
+                justify-content: center;
+            }
+
+            .newcontainer{
+                display: block;
+                width: 75%;
+                height: 75%;
+                background-color: #fff;
+                margin-top: 7.5vh;
+                border-radius: 20px;
+                padding: 20px;
+            }
+            #closebtn{
+                display: block;
+                width: 30px;
+                height: 30px;
+                background-color: #ddd;
+                border-radius: 50%;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+                text-align: center;
+                line-height: 25px;
+            }
+
+            #closebtn:hover{
+                background-color: #5A8ACB;
+                color: #fff;
+            }
+            label{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                margin-left: 5%;
+            }
+
+            input{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                margin-left: 5%;
+                width: 90%;
+                height: 30px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            
+
+            #addscreen,button{
+                display: block;
+                margin: auto;
+                margin-top: 20px;
+                min-width: 100px;
+                height: 30px;
+                background-color: #5A8ACB;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .space{
+                height: 50px;
+            }
+
+
+
+        </style>
+    </head>
+    <body>
+        <nav>
+            <item><h1>九鼎后台</h1></item>
+            <item>
+                <div class="line"></div>
+            </item>
+            <item>
+                <a href="/admin/pic">图片管理</a>
+            </item>
+            <item>
+                <a href="/admin/users">用户管理</a>
+            </item>
+            <item>
+                <a actived href="/admin/config">配置管理</a>
+            </item>
+            <item>
+                <a>配置修改日志</a>
+            </item>
+            <item>
+                <a href="/admin/logout">退出登录</a>
+            </item>
+        </nav>
+        <div id="container">
+            <div class="title">配置管理</div>
+            <div class="line"></div>
+            <div class="title1">
+                展馆图片放映设置
+            </div>
+            <div class="title2">展示屏幕设置</div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>宽/像素</td>
+                        <td>高/像素</td>
+                        <td>X坐标/m</td>
+                        <td>Y坐标/m</td>
+                        <td>Z坐标/m</td>
+                        <td>X旋转/°</td>
+                        <td>Y旋转/°</td>
+                        <td>Z旋转/°</td>
+                        <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button id="addscreen">添加屏幕</button>
+            <div class="title2">延时设置</div>
+            <label for="updatedelay">绘制展示屏幕延时/ms</label>
+            <input type="number" name="updatedelay" id="updatedelayi" placeholder="单位：毫秒">
+            <label for="changedelay">更换延时/ms</label>
+            <input type="number" name="changedelay" id="changedelayi" placeholder="单位：毫秒">
+            <div class="title2">展示屏幕绘制设置</div>
+            <label for="fontfamily">字体</label>
+            <input type="text" name="fontfamilyi" id="fontfamilyi" placeholder="字体">
+            <label for="fontcolor">字体颜色</label>
+            <input type="text" name="fontcolori" id="fontcolori" placeholder="颜色">
+            <label for="fontx">文字绘制左边距/px</label>
+            <input type="text" name="fontx" id="fontxi" placeholder="单位：像素">
+            <label for="fontbtm">字号/px</label>
+            <input type="text" name="fontbtm" id="fontbtmi" placeholder="单位：像素">
+            <div class="title2">杂项</div>
+            <label for="backgroundcolor">背景颜色</label>
+            <input type="text" name="backgroundcolori" id="backgroundcolori" placeholder="颜色">
+            <button id="savePic">保存展示屏幕配置</button>
+            <div class="space"></div>
+            <div class="line"></div>
+            <div class="title1">展馆设置</div>
+            <div class="title2">摄像机设置</div>
+            <label for="camFOV">视场角</label>
+            <input type="number" name="camFOVi" id="camFOVi" placeholder="单位：度">
+            <label for="camX">摄像机初始X坐标</label>
+            <input type="number" name="camXi" id="camXi" placeholder="单位：米">
+            <label for="camY">摄像机初始Y坐标</label>
+            <input type="number" name="camYi" id="camYi" placeholder="单位：米">
+            <label for="camZ">摄像机初始Z坐标</label>
+            <input type="number" name="camZi" id="camZi" placeholder="单位：米">
+            <label for="camNear">摄像机最近渲染距离</label>
+            <input type="number" name="camNeari" id="camNeari" placeholder="单位：米">
+            <label for="camFar">摄像机最远渲染距离</label>
+            <input type="number" name="camFari" id="camFari" placeholder="单位：米">
+            <div class="title2">摄像机运动设置</div>
+            <label for="camXMax">摄像机X最大值</label>
+            <input type="number" name="camXMaxi" id="camXMaxi" placeholder="单位：米">
+            <label for="camYMax">摄像机Y最大值</label>
+            <input type="number" name="camYMaxi" id="camYMaxi" placeholder="单位：米">
+            <label for="camXMin">摄像机X最小值</label>
+            <input type="number" name="camXMini" id="camXMini" placeholder="单位：米">
+            <label for="camYMin">摄像机Y最小值</label>
+            <input type="number" name="camYMini" id="camYMini" placeholder="单位：米">
+            <label for="camSpeed">摄像机运动速度</label>
+            <input type="number" name="camSpeedi" id="camSpeedi" placeholder="无明确单位">
+            <button id="saveGeneral">保存展馆设置</button>
+            <div class="space"></div>
+            <div class="line"></div>
+            <div class="title1">后端设置</div>
+            <label for="siteURL">站点URL</label>
+            <input type="text" name="siteURLi" id="siteURLi" placeholder="URL">
+            <button id="saveBackend">保存后端配置</button>
+            <div class="space"></div>
+        </div>
+    </body>
+    <script>
+        /*
+        展馆图片放映设置：
+        获取URL /api/config(GET)
+        保存URL /api/config(POST)
+        数据格式(带#的需获取ID为#后字符串的输入框的值，不带的保留)：
+        {
+            "escape": true,
+            "screens": [
+                [
+                    [
+                        宽,
+                        高
+                    ],
+                    [
+                        X坐标,
+                        Y坐标,
+                        Z坐标
+                    ],
+                    [
+                        X旋转,
+                        Y旋转,
+                        Z旋转
+                    ]
+                ],
+                ...
+            ],
+            "info": [
+                {
+                    "key": "stu_name",
+                    "display": "\u5b66\u751f\u59d3\u540d",
+                    "default": "\u4f5a\u540d"
+                },
+                {
+                    "key": "category",
+                    "display": "\u7c7b\u522b",
+                    "default": "\u672a\u77e5"
+                },
+                {
+                    "key": "work_name",
+                    "display": "\u4f5c\u54c1\u540d\u79f0",
+                    "default": "\u65e0\u540d"
+                },
+                {
+                    "key": "teacher",
+                    "display": "\u6307\u5bfc\u8001\u5e08",
+                    "default": "\u4f5a\u540d"
+                }
+            ],
+            "delay": {
+                "update": #updatedelayi,
+                "change": #changedelayi
+            },
+            "loadTimeout": 100000,
+            "text": {
+                "font": {
+                    "color": #fontcolori,
+                    "famliy": #fontfamilyi,
+                },
+                "position": {
+                    "x": #fontxi,
+                    "down-padding": #fontbtmi
+                }
+            },
+            "backgroundColor": #backgroundcolori
+        }
+        */
+        fetch("/api/config")
+            .then(res => res.json())
+            .then((data) => {
+                console.log(data);
+                document.querySelector("#updatedelayi").value = data.delay.update;
+                document.querySelector("#changedelayi").value = data.delay.change;
+                document.querySelector("#fontfamilyi").value = data.text.font.family;
+                document.querySelector("#fontcolori").value = data.text.font.color;
+                document.querySelector("#fontxi").value = data.text.position.x;
+                document.querySelector("#fontbtmi").value = data.text.position["down-padding"];
+                document.querySelector("#backgroundcolori").value = data.backgroundColor;
+                data.screens.forEach((screen) => {
+                    let tr = document.createElement("tr");
+                    let tdwidth = document.createElement("td");
+                    tdwidth.innerText = screen[0][0];
+                    tr.appendChild(tdwidth);
+                    let tdheight = document.createElement("td");
+                    tdheight.innerText = screen[0][1];
+                    tr.appendChild(tdheight);
+                    let tdx = document.createElement("td");
+                    tdx.innerText = screen[1][0];
+                    tr.appendChild(tdx);
+                    let tdy = document.createElement("td");
+                    tdy.innerText = screen[1][1];
+                    tr.appendChild(tdy);
+                    let tdz = document.createElement("td");
+                    tdz.innerText = screen[1][2];
+                    tr.appendChild(tdz);
+                    let tdxr = document.createElement("td");
+                    tdxr.innerText = screen[2][0];
+                    tr.appendChild(tdxr);
+                    let tdyr = document.createElement("td");
+                    tdyr.innerText = screen[2][1];
+                    tr.appendChild(tdyr);
+                    let tdzr = document.createElement("td");
+                    tdzr.innerText = screen[2][2];
+                    tr.appendChild(tdzr);
+
+                    let td = document.createElement("td");
+                    let button = document.createElement("button");
+                    button.innerText = "删除";
+                    button.onclick = () => {
+                        tr.remove();
+                    };
+                    td.appendChild(button);
+                    tr.appendChild(td);
+                    document.querySelector("table tbody").appendChild(tr);
+                });
+            });
+        document.querySelector("#addscreen").onclick = () => {
+            let tr = document.createElement("tr");
+            let tdwidth = document.createElement("td");
+            let width = document.createElement("input");
+            width.type = "number";
+            width.placeholder = "宽";
+            tdwidth.appendChild(width);
+            tr.appendChild(tdwidth);
+            let tdheight = document.createElement("td");
+            let height = document.createElement("input");
+            height.type = "number";
+            height.placeholder = "高";
+            tdheight.appendChild(height);
+            tr.appendChild(tdheight);
+            let tdx = document.createElement("td");
+            let x = document.createElement("input");
+            x.type = "number";
+            x.placeholder = "X坐标";
+            tdx.appendChild(x);
+            tr.appendChild(tdx);
+            let tdy = document.createElement("td");
+            let y = document.createElement("input");
+            y.type = "number";
+            y.placeholder = "Y坐标";
+            tdy.appendChild(y);
+            tr.appendChild(tdy);
+            let tdz = document.createElement("td");
+            let z = document.createElement("input");
+            z.type = "number";
+            z.placeholder = "Z坐标";
+            tdz.appendChild(z);
+            tr.appendChild(tdz);
+            let tdxr = document.createElement("td");
+            let xr = document.createElement("input");
+            xr.type = "number";
+            xr.placeholder = "X旋转";
+            tdxr.appendChild(xr);
+            tr.appendChild(tdxr);
+            let tdyr = document.createElement("td");
+            let yr = document.createElement("input");
+            yr.type = "number";
+            yr.placeholder = "Y旋转";
+            tdyr.appendChild(yr);
+            tr.appendChild(tdyr);
+            let tdzr = document.createElement("td");
+            let zr = document.createElement("input");
+            zr.type = "number";
+            zr.placeholder = "Z旋转";
+            tdzr.appendChild(zr);
+            tr.appendChild(tdzr);
+            let td = document.createElement("td");
+            let button = document.createElement("button");
+            button.innerText = "保存";
+            button.onclick = () => {
+                //remove
+                if (width.value == "" || height.value == "" || x.value == "" || y.value == "" || z.value == "" || xr.value == "" || yr.value == "" || zr.value == "") {
+                    alert("请填写完整");
+                    return;
+                }
+                tr.remove()
+                let trn = document.createElement("tr");
+                let tdwidth = document.createElement("td");
+                tdwidth.innerText = width.value;
+                trn.appendChild(tdwidth);
+                let tdheight = document.createElement("td");
+                tdheight.innerText = height.value;
+                trn.appendChild(tdheight);
+                let tdx = document.createElement("td");
+                tdx.innerText = x.value;
+                trn.appendChild(tdx);
+                let tdy = document.createElement("td");
+                tdy.innerText = y.value;
+                trn.appendChild(tdy);
+                let tdz = document.createElement("td");
+                tdz.innerText = z.value;
+                trn.appendChild(tdz);
+                let tdxr = document.createElement("td");
+                tdxr.innerText = xr.value;
+                trn.appendChild(tdxr);
+                let tdyr = document.createElement("td");
+                tdyr.innerText = yr.value;
+                trn.appendChild(tdyr);
+                let tdzr = document.createElement("td");
+                tdzr.innerText = zr.value;
+                trn.appendChild(tdzr);
+                let td = document.createElement("td");
+                let button = document.createElement("button");
+                button.innerText = "删除";
+                button.onclick = () => {
+                    tr.remove();
+                };
+                td.appendChild(button);
+                trn.appendChild(td);
+                document.querySelector("table tbody").appendChild(trn);
+            };
+            td.appendChild(button);
+            tr.appendChild(td);
+            document.querySelector("table tbody").appendChild(tr);
+        };
+        document.querySelector("#savePic").onclick=()=>{
+            let screens = [];
+            document.querySelectorAll("table tbody tr").forEach((tr)=>{
+                let screen = [];
+                //convet into number
+                screen.push([parseInt(tr.children[0].innerText),parseInt(tr.children[1].innerText)]);
+                screen.push([parseFloat(tr.children[2].innerText),parseFloat(tr.children[3].innerText),parseFloat(tr.children[4].innerText)]);
+                screen.push([parseFloat(tr.children[5].innerText),parseFloat(tr.children[6].innerText),parseFloat(tr.children[7].innerText)]);
+                screens.push(screen);
+            });
+            let data = {
+                "delay": {
+                    "update": document.querySelector("#updatedelayi").value,
+                    "change": document.querySelector("#changedelayi").value
+                },
+                "text": {
+                    "font": {
+                        "color": document.querySelector("#fontcolori").value,
+                        "family": document.querySelector("#fontfamilyi").value
+                    },
+                    "position": {
+                        "x": document.querySelector("#fontxi").value,
+                        "down-padding": document.querySelector("#fontbtmi").value
+                    }
+                },
+                "backgroundColor": document.querySelector("#backgroundcolori").value,
+                "screens": screens
+            };
+            console.log(data);
+            fetch("/api/config",{
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then((data)=>{
+                console.log(data);
+                alert("保存成功");
+            });
+        }
+
+
+        /*
+        展馆设置：
+        获取URL /config.json(GET)
+        保存URL /config.json(POST)
+        数据格式(带#的需获取ID为#后字符串的输入框的值，不带的保留)：
+        {
+            "camera": {
+                "FOV": #camFOVi,
+                "position": {
+                    "x": #camXi,
+                    "y": #camYi,
+                    "z": #camZi
+                },
+                "near": #camNeari,
+                "far": #camFari
+            },
+            "spaceBoundaries": {
+                "minX": #camXMini,
+                "maxX": #camXMaxi,
+                "minZ": #camYMini,
+                "maxZ": #camYMaxi
+            },
+            "modelURL": "##SITEURL##/api/model.glb",
+            "divElementID": "cav",
+            "moveDistance": #camSpeedi,
+            "handlers": [
+                {
+                    "type": "image",
+                    "backendurl": "##SITEURL##/api/"
+                }
+            ]
+        }
+        */
+        fetch("/config.json")
+            .then(res => res.json())
+            .then((data) => {
+                console.log(data);
+                document.querySelector("#camFOVi").value = data.camera.FOV;
+                document.querySelector("#camXi").value = data.camera.position.x;
+                document.querySelector("#camYi").value = data.camera.position.y;
+                document.querySelector("#camZi").value = data.camera.position.z;
+                document.querySelector("#camNeari").value = data.camera.near;
+                document.querySelector("#camFari").value = data.camera.far;
+                document.querySelector("#camXMini").value = data.spaceBoundaries.minX;
+                document.querySelector("#camXMaxi").value = data.spaceBoundaries.maxX;
+                document.querySelector("#camYMini").value = data.spaceBoundaries.minZ;
+                document.querySelector("#camYMaxi").value = data.spaceBoundaries.maxZ;
+                document.querySelector("#camSpeedi").value = data.moveDistance;
+                document.querySelector("#siteURLi").value = data.modelURL.split("/api")[0];
+            });
+        document.querySelector("#saveGeneral").onclick=()=>{
+            let data = {
+                "camera": {
+                    "FOV": document.querySelector("#camFOVi").value,
+                    "position": {
+                        "x": document.querySelector("#camXi").value,
+                        "y": document.querySelector("#camYi").value,
+                        "z": document.querySelector("#camZi").value
+                    },
+                    "near": document.querySelector("#camNeari").value,
+                    "far": document.querySelector("#camFari").value
+                },
+                "spaceBoundaries": {
+                    "minX": document.querySelector("#camXMini").value,
+                    "maxX": document.querySelector("#camXMaxi").value,
+                    "minZ": document.querySelector("#camYMini").value,
+                    "maxZ": document.querySelector("#camYMaxi").value
+                },
+                "modelURL": document.querySelector("#siteURLi").value+"/api/model.glb",
+                "divElementID": "cav",
+                "moveDistance": document.querySelector("#camSpeedi").value,
+                "handlers": [
+                    {
+                        "type": "image",
+                        "backendurl": document.querySelector("#siteURLi").value+"/api/"
+                    }
+                ]
+            };
+            console.log(data);
+            fetch("/config.json",{
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then((data)=>{
+                console.log(data);
+                alert("保存成功");
+            });
+        }
+        /*
+        站点设置
+        获取URL /panel/config(GET)
+        保存URL /panel/config(POST)
+        数据格式(带#的需获取ID为#后字符串的输入框的值，不带的保留)：
+        {"site-url": #siteURLi}
+        */
+        fetch("/panel/config")
+            .then(res => res.json())
+            .then((data) => {
+                console.log(data);
+                document.querySelector("#siteURLi").value = data["site-url"];
+            });
+        document.querySelector("#saveBackend").onclick=()=>{
+            let data = {
+                "site-url": document.querySelector("#siteURLi").value
+            };
+            console.log(data);
+            fetch("/panel/config",{
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res=>res.json())
+            .then((data)=>{
+                console.log(data);
+                alert("保存成功");
+            });
+        }
+    </script>
+</html>

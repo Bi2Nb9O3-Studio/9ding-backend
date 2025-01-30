@@ -1,7 +1,6 @@
 from hashlib import sha256
 import sqlite3
 import threading
-import app.models.config as config
 
 class Connection():
     def __init__(self, path, lock: threading.Lock):

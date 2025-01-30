@@ -180,7 +180,7 @@ picconfig = Config("./configs/pic.json", 0,{
         "font": {
             "color": "black",
             "size": "30px",
-                    "famliy": "Simihei"
+                    "family": "Simihei"
         },
         "position": {
             "x": 50,
