@@ -34,7 +34,6 @@ def post_image():
     return jsonify({"message": "success", "status": 200, "id": cur.lastrowid}), 200
 
 
-
 @blueprint.route("/api/content/<int:id>", methods=["GET"])
 def get_image(id):
     '''
@@ -81,7 +80,12 @@ def modify_image(id):
             cur.execute("SELECT * FROM images WHERE id=?", (id,))
             if not cur.fetchone():
                 return jsonify({"message": f"image(id={id}) not found,please post first", "status": 404}), 404
-
+        # print(d["image"])
+        if d["image"] == "##remain##":
+            with database.db.connect() as (con, cur):
+                cur.execute("UPDATE images SET author=?, name=?, category=?, teacher=? WHERE id=?",
+                            (d["stu_name"], d["work_name"], d["category"], d["teacher"], id))
+            return jsonify({"message": "success", "status": 200}), 200
         with database.db.connect() as (con, cur):
             cur.execute("UPDATE images SET author=?, name=?, category=?, teacher=?, image=? WHERE id=?",
                         (d["stu_name"], d["work_name"], d["category"], d["teacher"], d["image"], id))
@@ -167,7 +171,8 @@ def getmetadatasliced():
         page = int(request.args.get("page", 1))
         limit = int(request.args.get("limit", 10))
         with database.db.connect() as (con, cur):
-            cur.execute(f"SELECT * FROM images LIMIT {limit} OFFSET {(page-1)*limit}")
+            cur.execute(
+                f"SELECT * FROM images LIMIT {limit} OFFSET {(page-1)*limit}")
             data = cur.fetchall()
         resp = []
         for i in data:

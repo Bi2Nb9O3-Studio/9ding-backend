@@ -36,7 +36,7 @@ def logout():
     POST /admin/logout
     `need login`
     '''
-    response = jsonify({"success": "logout success"})
+    response = redirect("/admin/login")
     auth.set_logout_status(response)
     return response
 

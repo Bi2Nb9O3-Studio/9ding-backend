@@ -155,8 +155,8 @@
                 justify-content: center;
             }
 
-            #newcontainer{
-                display: block;
+            #newcontainer,#modcontainer{
+                display: none;
                 width: 75%;
                 height: 75%;
                 background-color: #fff;
@@ -220,7 +220,13 @@
                 <a href="/admin/users">用户管理</a>
             </item>
             <item>
-                <a>配置管理</a>
+                <a href="/admin/config">配置管理</a>
+            </item>
+            <item>
+                <a>配置修改日志</a>
+            </item>
+            <item>
+                <a href="/admin/logout">退出登录</a>
             </item>
         </nav>
         <div id="container">
@@ -229,7 +235,7 @@
             <div style="display: flex; justify-content: space-between;width: 90%; margin-left: 5%;">
                 <div id="pageselection">
                 </div>
-                <button id="new" onclick="document.getElementById('newpop').style.display='flex'">上传新图片</button>
+                <button id="new" onclick="document.getElementById('newpop').style.display='flex';document.getElementById('newcontainer').style.display='block';document.getElementById('modcontainer').style.display='none'">上传新图片</button>
             </div>
             <table>
                 <thead>
@@ -267,6 +273,29 @@
                     <input type="text" name="teacher" id="teacher">
                     <br>
                     <button id="uploadnew">上传</button>
+                </div>
+            </div>
+            
+            <div id="modcontainer">
+                <button id="closebtn" onclick="document.getElementById('newpop').style.display='none';">X</button>
+                <h1>修改图片信息</h1>
+                <div action="/api/content" method="post" enctype="multipart/form-data">
+                    <label for="fileid">图片编号</label>
+                    <select name="fileid" id="Mfileid"></select>
+                    <br>
+                    <label for="stu_name">作者</label>
+                    <input type="text" name="stu_name" id="Mstu_name">
+                    <br>
+                    <label for="work_name">标题</label>
+                    <input type="text" name="work_name" id="Mwork_name">
+                    <br>
+                    <label for="category">类别</label>
+                    <input type="text" name="category" id="Mcategory">
+                    <br>
+                    <label for="teacher">指导老师</label>
+                    <input type="text" name="teacher" id="Mteacher">
+                    <br>
+                    <button id="uploadmod">上传</button>
                 </div>
             </div>
         </div>
@@ -322,9 +351,25 @@
                         <td>${item.info.work_name}</td>
                         <td>${item.info.category}</td>
                         <td>${item.info.teacher}</td>
-                        <td><button onclick="delete_item(${id})">删除</button></td>
+                        <td><button onclick="delete_item(${id})">删除</button><button id="modpic${id}">修改</button></td>
                     `;
                     table.appendChild(tr);
+                    let option = document.createElement("option");
+                    option.value = id;
+                    option.innerText = id+" - "+item.info.stu_name+" 的 "+item.info.work_name;
+                    document.querySelector("#Mfileid").appendChild(option);
+                    document.querySelector("#modpic"+id).onclick = () => {
+                        let i = item;
+                        let ID = id;
+                        document.getElementById('newpop').style.display='flex';
+                        document.getElementById('newcontainer').style.display='none';
+                        document.getElementById('modcontainer').style.display='block';
+                        document.querySelector("#Mfileid").value = ID;
+                        document.querySelector("#Mstu_name").value = i.info.stu_name;
+                        document.querySelector("#Mwork_name").value = i.info.work_name;
+                        document.querySelector("#Mcategory").value = i.info.category;
+                        document.querySelector("#Mteacher").value = i.info.teacher;
+                    };
                 })};
         document.querySelector("#uploadnew").onclick = () => {
             let file = document.querySelector("#file").files[0];
@@ -355,6 +400,33 @@
                 });
             });
         };
+        document.querySelector("#uploadmod").onclick=()=>{
+            let fileid = document.querySelector("#Mfileid").value;
+            let stu_name = document.querySelector("#Mstu_name").value;
+            let work_name = document.querySelector("#Mwork_name").value;
+            let category = document.querySelector("#Mcategory").value;
+            let teacher = document.querySelector("#Mteacher").value;
+            fetch("/api/content/"+fileid, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "stu_name":stu_name,
+                    "work_name":work_name,
+                    "category":category,
+                    "teacher":teacher,
+                    "image":"##remain##"
+                })
+            }).then(res => {
+                if (res.status === 200) {
+                    alert("修改成功");
+                    window.location.reload();
+                } else {
+                    alert("修改失败 错误："+res.error);
+                }
+            });
+        }
 
         fetch("/api/metadata")
             .then(res => res.json())

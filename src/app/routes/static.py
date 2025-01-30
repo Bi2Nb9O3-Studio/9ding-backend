@@ -1,6 +1,6 @@
 import os
 import flask
-from flask import jsonify, make_response, request, send_file
+from flask import jsonify, make_response, redirect, request, send_file
 from io import BytesIO
 from app import auth
 import app.models.database as database
@@ -26,8 +26,10 @@ def empty():
 @blueprint.route("/admin/login", methods=["GET"])
 def login():
     '''
-    GET /admin/index
+    GET /admin/login
     '''
+    if auth.logined_valid(flask.request):
+        return redirect("/admin/pic")
     return send_file("static/admin/login.html")
 
 @blueprint.route("/admin/pic", methods=["GET"])
@@ -46,3 +48,11 @@ def users():
     GET /admin/pic
     '''
     return send_file("static/admin/users.html")
+
+@blueprint.route("/admin/config", methods=["GET"])
+@auth.login_required
+def config():
+    '''
+    GET /admin/pic
+    '''
+    return send_file("static/admin/config.html")
