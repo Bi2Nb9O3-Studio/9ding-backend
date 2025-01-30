@@ -77,7 +77,8 @@ def remove_user():
     `need login`
     '''
     data = request.get_json()
-    all=auth.all_users()
+    all = auth.all_users()
+    # print(type(data['userid']))
     if data['userid'] not in [i[0] for i in all]:
         return jsonify({"status":400, "reason":"用户不存在"}),400
     auth.remove_user(data["userid"])
@@ -100,6 +101,8 @@ def change_password():
     need login
     '''
     data = request.json
+    if re.search(r"\W", data['username']) is not None:
+        return jsonify({"status":400, "reason":"用户名不合法"}),400
     with database.db.connect() as (con, cur):
         cur.execute(f"SELECT id FROM users")
         result = cur.fetchall()
