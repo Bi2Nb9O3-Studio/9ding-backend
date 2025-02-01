@@ -1,9 +1,10 @@
 import os
 import shutil
+import sys
 import zipfile
 import requests
 from tqdm import tqdm
-
+from . import __version__
 
 def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name='9ding-js', file_name="bundle.js"):
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
@@ -43,8 +44,12 @@ def download_file(url: str, fname: str, github:bool=True):
 
 
 def compare_version(a, b):
-    a = a[1:].split(".")
-    b = b[1:].split(".")
+    if a.startswith("v"):
+        a = a[1:]
+    if b.startswith("v"):
+        b = b[1:]
+    a = a.split(".")
+    b = b.split(".")
     for i in range(3):
         if int(a[i]) > int(b[i]):
             return 1
@@ -81,3 +86,16 @@ def download_font():
     os.remove("./Fira_Code_v6.2.zip")
     shutil.rmtree("./tmp", ignore_errors=True)
     print("Font downloaded")
+def get_current_version():
+    return __version__.v
+
+def update_app():
+    url, tag = get_latest_release_download_url_tag(repo_name="9ding-backend", file_name="app.pyz")
+    os.makedirs("./tmp1/", exist_ok=True)
+    if compare_version(tag,get_current_version()):
+        download_file(url, "./tmp1/app.pyz")
+        with open("./tmp1/script.sh",mode="r") as f:
+            f.write(
+                f"rm ../{os.path.basename(__file__)}  \n mv ./app.pyz ../{os.path.basename(__file__)}")
+    else:
+        print("App is up to date")

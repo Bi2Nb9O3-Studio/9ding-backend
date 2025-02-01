@@ -30,7 +30,7 @@ def login():
     '''
     if auth.logined_valid(flask.request):
         return redirect("/admin/pic")
-    return send_file("static/admin/login.html")
+    return send_file(os.path.abspath("./bundle/bundle.js"))
 
 @blueprint.route("/admin/pic", methods=["GET"])
 @auth.login_required
