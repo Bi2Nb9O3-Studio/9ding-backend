@@ -8,11 +8,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            #get version from ./src/version.py
-            #file content: __version__ = "vx.x.x"
+            #get version from ./src/version
+            #file content: "x.x.x"
             - name: Get Version
               id: package-version
-              run: echo ::set-output name=current-version::$(grep -oP '__version__ = "\K(.*)(?=")' ./src/__version__.py)
+              run : echo ::set-output name=current-version::$(cat ./src/version)
             - name: Create a Release
               id: create_release
               uses: actions/create-release@v1
