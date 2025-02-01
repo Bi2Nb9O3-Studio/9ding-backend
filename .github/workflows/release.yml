@@ -1,0 +1,37 @@
+name: Upload Release Asset
+
+on:
+    workflow_dispatch:
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            #get version from ./src/version.py
+            #file content: __version__ = "vx.x.x"
+            - name: Get Version
+              id: package-version
+              run: echo ::set-output name=current-version::$(grep -oP '__version__ = "\K(.*)(?=")' ./src/__version__.py)
+            - name: Create a Release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ steps.package-version.outputs.current-version }}
+                  release_name: Release v${{steps.package-version.outputs.current-version}} by Action(#${{ github.run_number }})
+                  draft: false
+                  prerelease: false
+            - name: Zip App
+              run: zip -r ./app.pyz ./src
+            - name: Upload Release Asset
+              id: upload-release-asset-doc
+              uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./app.zip
+                  asset_name: app.zip
+                  asset_content_type: application/javascript

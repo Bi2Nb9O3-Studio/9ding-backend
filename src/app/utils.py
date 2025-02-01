@@ -5,7 +5,7 @@ import PIL
 import PIL.Image
 import watermarker
 import watermarker.marker
-watermarker.marker.TTF_FONT = "../font/FiraCode-Regular.ttf"
+watermarker.marker.TTF_FONT = "./FiraCode-Regular.ttf"
 def baseN(num, b):
     '''进制PlusProMax'''
     return ((num == 0) and "0") or (baseN(num // b, b).lstrip("0") + r"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;:/\|<>@#$%&-+"[num % b])
