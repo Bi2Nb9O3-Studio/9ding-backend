@@ -12,7 +12,7 @@ def index():
 
 @blueprint.route("/bundle.js", methods=["GET"])
 def bundle():
-    return send_file("./bundle/bundle.js")
+    return send_file("../bundle/bundle.js")
 
 
 @blueprint.route("/api/content/empty", methods=["GET"])

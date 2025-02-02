@@ -283,3 +283,4 @@ pyrightconfig.json
 # CUSTOM
 /local-site
 /run
+/instance
