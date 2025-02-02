@@ -22,7 +22,7 @@ jobs:
                   draft: false
                   prerelease: false
             - name: Zip App
-              run: zip -r ./app.pyz ./src
+              run: zip -r ./app.zip ./src/* ./requirements.txt
             - name: Upload Release Asset
               id: upload-release-asset-doc
               uses: actions/upload-release-asset@v1
@@ -30,6 +30,6 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: ./app.pyz
-                  asset_name: app.pyz
+                  asset_path: ./app.zip
+                  asset_name: app.zip
                   asset_content_type: application/javascript
