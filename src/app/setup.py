@@ -2,10 +2,10 @@ from flask import Flask, make_response
 from . import routes
 import app.models.config as config
 
-app1=Flask(__name__)
-app1.register_blueprint(routes.built_blueprint)
+app=Flask(__name__)
+app.register_blueprint(routes.built_blueprint)
 
-@app1.after_request
+@app.after_request
 def after(resp):
     '''
     被after_request钩子函数装饰过的视图函数 
@@ -18,6 +18,3 @@ def after(resp):
     resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE'
     resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
     return resp
-
-def run(debug):
-    app1.run(debug=debug)

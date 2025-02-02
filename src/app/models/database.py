@@ -40,7 +40,7 @@ class Database():
             )
             #insert default user if note exists
             cur.execute(
-                f"INSERT INTO users values (1, 'admin', 'e60da41b2603a837ac93532e4cc11a68f99b8209e8fdd5b7643a9ebc5028784e') ON CONFLICT DO NOTHING"
+                f"INSERT OR IGNORE INTO users values (1, 'admin', 'e60da41b2603a837ac93532e4cc11a68f99b8209e8fdd5b7643a9ebc5028784e')"
             )
 
 

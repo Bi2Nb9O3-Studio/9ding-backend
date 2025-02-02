@@ -1,10 +1,8 @@
 import os
 import shutil
-import sys
 import zipfile
 import requests
 from tqdm import tqdm
-from . import __version__
 
 def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name='9ding-js', file_name="bundle.js"):
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
@@ -20,17 +18,11 @@ def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name=
         print("Failed to retrieve the latest release")
 
 
-
-
 def download_file(url: str, fname: str, github:bool=True):
     if github:
         url = "https://github.moeyy.xyz/"+url
-    # 用流stream的方式获取url的数据
     resp = requests.get(url, stream=True)
-    # 拿到文件的长度，并把total初始化为0
     total = int(resp.headers.get('content-length', 0))
-    # 打开当前目录的fname文件(名字你来传入)
-    # 初始化tqdm，传入总数，文件名等数据，接着就是写入，更新等操作了
     with open(fname, 'wb') as file, tqdm(
         desc=fname,
         total=total,
@@ -86,16 +78,3 @@ def download_font():
     os.remove("./Fira_Code_v6.2.zip")
     shutil.rmtree("./tmp", ignore_errors=True)
     print("Font downloaded")
-def get_current_version():
-    return __version__.v
-
-def update_app():
-    url, tag = get_latest_release_download_url_tag(repo_name="9ding-backend", file_name="app.pyz")
-    os.makedirs("./tmp1/", exist_ok=True)
-    if compare_version(tag,get_current_version()):
-        download_file(url, "./tmp1/app.pyz")
-        with open("./tmp1/script.sh",mode="r") as f:
-            f.write(
-                f"rm ../{os.path.basename(__file__)}  \n mv ./app.pyz ../{os.path.basename(__file__)}")
-    else:
-        print("App is up to date")

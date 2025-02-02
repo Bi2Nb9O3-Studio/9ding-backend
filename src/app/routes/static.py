@@ -1,12 +1,8 @@
-import os
 import flask
 from flask import jsonify, make_response, redirect, request, send_file
-from io import BytesIO
-from app import auth
-import app.models.database as database
-import app.utils as utils
-import app.models.config as config
-# import app.static
+import app.auth as auth
+import os
+
 
 blueprint = flask.Blueprint("static", __name__)
 
@@ -16,7 +12,7 @@ def index():
 
 @blueprint.route("/bundle.js", methods=["GET"])
 def bundle():
-    return send_file("static/bundle.js")
+    return send_file("./bundle/bundle.js")
 
 
 @blueprint.route("/api/content/empty", methods=["GET"])
@@ -30,7 +26,7 @@ def login():
     '''
     if auth.logined_valid(flask.request):
         return redirect("/admin/pic")
-    return send_file(os.path.abspath("./bundle/bundle.js"))
+    return send_file("static/admin/login.html")
 
 @blueprint.route("/admin/pic", methods=["GET"])
 @auth.login_required
