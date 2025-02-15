@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import flask
@@ -152,5 +153,5 @@ def revert_config():
     with database.db.connect() as (con, cur):
         cur.execute(f"SELECT * FROM cfg_history WHERE id={data['id']}")
         result = cur.fetchone()
-    map[result[1]].set(result[2])
+    map[result[1]].set(json.loads(result[2]))
     return jsonify({"status":200, "msg":"revert success"})
