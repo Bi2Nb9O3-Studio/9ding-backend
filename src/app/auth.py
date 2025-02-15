@@ -1,22 +1,16 @@
 from hashlib import sha256
 from functools import wraps
-import random
 import re
 import time
 from typing import Tuple
 import flask
 from app import utils
 import app.models.database as database
-import base64
-from Crypto.Cipher import AES
-from Crypto import Random
 import os
 import base64
 import json
 
 salt = "d39d977837414790d42ecd351f59da887d7c41f1a62b5463475bf1c6dc1bd556"
-key = "WnjdH1xTxVBpHMezzIRhPEbbxmxtIYvr"
-cipher = AES.new(key)
 
 def verify_password(username: str, password: str) -> Tuple[bool, str]:
     # get the password of user

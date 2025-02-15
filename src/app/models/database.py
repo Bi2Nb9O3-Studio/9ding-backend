@@ -1,5 +1,5 @@
-from hashlib import sha256
 import sqlite3
+import os
 import threading
 
 class Connection():
@@ -44,6 +44,6 @@ class Database():
             )
 
 
-
+os.makedirs("./database/", exist_ok=True)
 db = Database("./database.db")
 db.init()

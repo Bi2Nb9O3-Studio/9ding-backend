@@ -3,7 +3,7 @@ from . import routes
 import app.models.config as config
 
 def create_app():
-    app=Flask(__name__)
+    app = Flask(__name__)
     app.register_blueprint(routes.built_blueprint)
 
     @app.after_request
@@ -19,3 +19,4 @@ def create_app():
         resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE'
         resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
         return resp
+    return app

@@ -59,6 +59,7 @@ def checkifnewversion(tag):
 
 def update_bundle():
     url, tag = get_latest_release_download_url_tag()
+    os.makedirs("./bundle/", exist_ok=True)
     if checkifnewversion(tag):
         download_file(url, "./bundle/bundle.js")
         with open("./bundle/version", mode="w") as f:

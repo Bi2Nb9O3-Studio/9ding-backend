@@ -32,6 +32,7 @@ class Config():
             cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",(self.cid,str(newdata),time.strftime("%Y-%m-%d-%H-%M-%S")))
         self.lock.release()
 
+os.makedirs("./configs/", exist_ok=True)
 
 picconfig = Config("./configs/pic.json", 0,{
     "escape": True,
