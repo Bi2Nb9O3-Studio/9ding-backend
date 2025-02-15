@@ -1,12 +1,22 @@
 from hashlib import sha256
 from functools import wraps
+import random
 import re
+import time
 from typing import Tuple
 import flask
+from app import utils
 import app.models.database as database
+import base64
+from Crypto.Cipher import AES
+from Crypto import Random
+import os
+import base64
+import json
 
 salt = "d39d977837414790d42ecd351f59da887d7c41f1a62b5463475bf1c6dc1bd556"
-
+key = "WnjdH1xTxVBpHMezzIRhPEbbxmxtIYvr"
+cipher = AES.new(key)
 
 def verify_password(username: str, password: str) -> Tuple[bool, str]:
     # get the password of user
@@ -41,19 +51,19 @@ def change_password(userid: int, password: str):
 def set_logined_status(username, respone: flask.Response):
     respone.set_cookie("username", username, max_age=60 *
                        60*24, expires=60*60*24)
-    respone.set_cookie("verification", sha256((salt+username+salt).encode()
-                                              ).hexdigest()+sha256(salt.encode()).hexdigest(), max_age=60*60*24, expires=60*60*24, secure=True)
+    respone.set_cookie("verification", generate_verification(username), max_age=60*60, expires=60*60)
 
 
 def set_logout_status(respone: flask.Response):
-    respone.set_cookie("username", "")
-    respone.set_cookie("verification", "")
+    respone.delete_cookie("username")
+    respone.set_cookie("verification")
 
 
 def logined_valid(request: flask.Request):
-    if request.cookies.get("username") == None or request.cookies.get("verification") == None or request.cookies.get("username") == "" or request.cookies.get("verification") == "":
+    if request.cookies.get("username") is None or request.cookies.get("verification") is None or request.cookies.get("username") == "" or request.cookies.get("verification") == "":
         return False
-    return request.cookies.get("verification") == sha256((salt+request.cookies.get("username")+salt).encode()).hexdigest()+sha256(salt.encode()).hexdigest()
+    # return request.cookies.get("verification") == sha256((salt+request.cookies.get("username")+salt).encode()).hexdigest()+sha256(salt.encode()).hexdigest()
+    return verification(request.cookies.get("username"), request.cookies.get("verification"))
 
 
 def login_required(func):
@@ -76,3 +86,17 @@ def get_userid(username):
     with database.db.connect() as (con, cur):
         cur.execute(f"SELECT id FROM users WHERE username='{username}'")
         return cur.fetchone()[0]
+
+
+def verification(username, code):
+    try:
+        decrypted_data = utils.decrypt(code)
+        data=json.loads(decrypted_data[:-16])
+        return data["username"]==username and time.time()-data["time"]<3600
+    except:
+        return False
+
+def generate_verification(username):
+    return utils.encrypt(json.dumps({"username":username,"time":time.time()}) + os.urandom(16).hex())
+
+
