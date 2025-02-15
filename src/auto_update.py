@@ -4,6 +4,7 @@ import zipfile
 import requests
 from tqdm import tqdm
 
+
 def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name='9ding-js', file_name="bundle.js"):
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
     response = requests.get(url)
@@ -18,7 +19,7 @@ def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name=
         print("Failed to retrieve the latest release")
 
 
-def download_file(url: str, fname: str, github:bool=True):
+def download_file(url: str, fname: str, github: bool = True):
     if github:
         url = "https://github.moeyy.xyz/"+url
     resp = requests.get(url, stream=True)
@@ -44,15 +45,16 @@ def compare_version(a, b):
     b = b.split(".")
     for i in range(3):
         if int(a[i]) > int(b[i]):
+            # print(f"New version: {a} > {b}")
             return 1
-        elif int(a[i]) < int(b[i]):
-            return 0
+    # print(f"Old version: {a} <= {b}")
+    return 0
 
 
 def checkifnewversion(tag):
     if os.path.exists("./bundle/version"):
         with open("./bundle/version", mode="r") as f:
-            return compare_version(f.read(), tag)
+            return compare_version(tag,f.read())
     else:
         return 1
 
