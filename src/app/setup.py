@@ -4,6 +4,7 @@ import app.models.config as config
 
 def create_app():
     app = Flask(__name__)
+    app.config['port']=5002
     app.register_blueprint(routes.built_blueprint)
 
     @app.after_request
