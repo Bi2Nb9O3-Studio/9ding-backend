@@ -1,5 +1,6 @@
 from hashlib import sha256
 from functools import wraps
+import random
 import re
 import time
 from typing import Tuple
@@ -85,12 +86,12 @@ def get_userid(username):
 def verification(username, code):
     try:
         decrypted_data = utils.decrypt(code)
-        data=json.loads(decrypted_data[:-16])
+        data = json.loads(decrypted_data[:-16])
         return data["username"]==username and time.time()-data["time"]<3600
-    except:
+    except Exception as e:
         return False
 
 def generate_verification(username):
-    return utils.encrypt(json.dumps({"username":username,"time":time.time()}) + os.urandom(16).hex())
+    return utils.encrypt(json.dumps({"username":username,"time":time.time()}) + ''.join(random.sample("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 16)))
 
 

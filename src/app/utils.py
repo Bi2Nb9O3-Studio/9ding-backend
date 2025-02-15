@@ -62,7 +62,7 @@ def encrypt(text):
     cryptos = AES.new(key, mode)
 
     cipher_text = cryptos.encrypt(text)
-    return b2a_hex(cipher_text)
+    return b2a_hex(cipher_text).decode('utf-8')
 
 
 # 解密后，去掉补足的空格用strip() 去掉
