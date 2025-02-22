@@ -1,9 +1,18 @@
 import os
 import shutil
+import subprocess
+import sys
 import zipfile
 import requests
 from tqdm import tqdm
+from app.version import v
 
+fifofile=""
+
+
+def trigger_uwsgi_reload():
+    with open(fifofile, 'w') as fifo:
+        fifo.write('r')
 
 def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name='9ding-js', file_name="bundle.js"):
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
@@ -51,12 +60,15 @@ def compare_version(a, b):
     return 0
 
 
-def checkifnewversion(tag):
-    if os.path.exists("./bundle/version"):
-        with open("./bundle/version", mode="r") as f:
-            return compare_version(tag,f.read())
+def checkifnewversion(tag,current=None):
+    if current is None:
+        if os.path.exists("./bundle/version"):
+            with open("./bundle/version", mode="r") as f:
+                return compare_version(tag,f.read())
+        else:
+            return 1
     else:
-        return 1
+        return compare_version(tag,current)
 
 
 def update_bundle():
@@ -69,6 +81,7 @@ def update_bundle():
         print("Bundle updated")
     else:
         print("Bundle is up to date")
+        return 1
 
 
 def download_font():
@@ -81,3 +94,33 @@ def download_font():
     os.remove("./Fira_Code_v6.2.zip")
     shutil.rmtree("./tmp", ignore_errors=True)
     print("Font downloaded")
+
+def update_self():
+    url, tag = get_latest_release_download_url_tag(repo_name="9ding-backend",file_name="app.zip")
+    if checkifnewversion(tag,v):
+        os.makedirs("./tmp2", exist_ok=True)
+        download_file(url, "./tmp2/app.zip")
+        #Strucutre of app.zip:
+        # - app.zip
+        #   - src
+        #     - app
+        #       ...
+        #   - requirements.txt
+        zipfile.ZipFile("./tmp2/app.zip").extractall("./tmp2")
+        os.remove("./tmp2/app.zip")
+        # 将解压后的文件中的src目录每个都复制到当前目录的对应位置，如 src/app/setup.py 复制到 ./app/setup.py
+        for root, dirs, files in os.walk("./tmp2/src"):
+            for file in files:
+                os.makedirs(os.path.join(".", root[11:]), exist_ok=True)
+                shutil.copy(os.path.join(root, file), os.path.join(".", root[11:],file))
+        # 安装新的依赖
+        subprocess.check_call([sys.executable, "-m", "pip", "freeze", ">", "old_requirements.txt"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install",
+                              "--upgrade", "--force-reinstall", "-r", "./tmp2/requirements.txt"])
+        print("Self updated")
+        shutil.rmtree("./tmp2", ignore_errors=True)
+        trigger_uwsgi_reload()
+        sys.exit(0)
+    else:
+        print("Self is up to date")
+        return 1

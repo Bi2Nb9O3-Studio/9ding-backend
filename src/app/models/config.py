@@ -5,17 +5,19 @@ import time
 from uuid import uuid4
 import app.models.database as db
 
+
 class Config():
     def __init__(self, filepath, id, init={}):
-        self.cid=id
+        self.cid = id
         self.path = filepath
-        
+
         if not os.path.exists(self.path):
             with open(self.path, "w") as f:
                 f.write(json.dumps(init))
-            with db.db.connect() as (con,cur):
-                cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",(self.cid,json.dumps(init),time.strftime("%Y-%m-%d-%H-%M-%S")))
-        
+            with db.db.connect() as (con, cur):
+                cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",
+                            (self.cid, json.dumps(init), time.strftime("%Y-%m-%d-%H-%M-%S")))
+
         with open(self.path, "r") as f:
             self.data = json.loads(f.read())
         self.lock = threading.Lock()
@@ -28,13 +30,15 @@ class Config():
         self.data = newdata
         with open(self.path, "w") as f:
             f.write(json.dumps(self.data))
-        with db.db.connect() as (con,cur):
-            cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",(self.cid,json.dumps(newdata),time.strftime("%Y-%m-%d-%H-%M-%S")))
+        with db.db.connect() as (con, cur):
+            cur.execute("INSERT INTO cfg_history (cid,data,time) VALUES (?,?,?)",
+                        (self.cid, json.dumps(newdata), time.strftime("%Y-%m-%d-%H-%M-%S")))
         self.lock.release()
+
 
 os.makedirs("./configs/", exist_ok=True)
 
-picconfig = Config("./configs/pic.json", 0,{
+picconfig = Config("./configs/pic.json", 0, {
     "escape": True,
     "screens": [
         [
@@ -220,6 +224,6 @@ generalconfig = Config("./configs/general.json", 1, {
 }
 )
 
-panelconfig = Config("./configs/panel.json", 2, {
-    "site-url":"http://localhost:5000"
-})
+panelconfig = Config("./configs/panel.json", 2, {"site-url": "http://localhost:5002", "update": {
+                     "bundle": {"action": "at_once", "interval": 300000}, "app": {"action": "at_once", "interval": 300000}}})
+

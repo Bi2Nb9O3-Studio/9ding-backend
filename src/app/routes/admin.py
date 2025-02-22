@@ -3,10 +3,11 @@ import os
 import re
 import flask
 from flask import jsonify, make_response, redirect, request, send_file
-from io import BytesIO
+import app.version as ver
 import app.models.database as database
 import app.auth as auth
 import app.models.config as config
+import auto_update as atp
 
 blueprint = flask.Blueprint("admin", __name__)
 
@@ -155,3 +156,73 @@ def revert_config():
         result = cur.fetchone()
     map[result[1]].set(json.loads(result[2]))
     return jsonify({"status":200, "msg":"revert success"})
+
+@blueprint.route("/admin/version", methods=["GET"])
+@auth.login_required
+def version():
+    '''
+    获取版本号
+    GET /admin/version
+    `need login`
+    '''
+    return ver.v
+
+@blueprint.route("/admin/update", methods=["POST"])
+@auth.login_required
+def update():
+    '''
+    更新
+    POST /admin/update
+    `need login`
+    '''
+    q=atp.update_self()
+    return jsonify({"status":200, "msg":"success"+(" no new version" if q==1 else "")})
+
+@blueprint.route("/admin/update_bundle", methods=["POST"])
+@auth.login_required
+def update_bundle():
+    '''
+    更新bundle
+    POST /admin/update_bundle
+    `need login`
+    '''
+    q=atp.update_bundle()
+    return jsonify({"status": 200, "msg": "success"+(" no new version" if q == 1 else "")})
+
+@blueprint.route("/admin/check_bundle", methods=["POST"])
+@auth.login_required
+def check_bundle():
+    '''
+    检查bundle
+    POST /admin/check_bundle
+    `need login`
+    '''
+    url, tag = atp.get_latest_release_download_url_tag()
+    if atp.checkifnewversion(tag):
+        return jsonify({"status":200, "msg":"new version available"})
+    return jsonify({"status":200, "msg":"no new version"})
+
+@blueprint.route("/admin/check_app", methods=["POST"])
+@auth.login_required
+def check_app():
+    '''
+    检查app
+    POST /admin/check_app
+    `need login`
+    '''
+    url, tag = atp.get_latest_release_download_url_tag()
+    if atp.checkifnewversion(tag, ver.v):
+        return jsonify({"status":200, "msg":"new version available"})
+    return jsonify({"status":200, "msg":"no new version"})
+
+@blueprint.route("/admin/bundle_version", methods=["GET"])
+@auth.login_required
+def bundle_version():
+    '''
+    获取bundle版本
+    GET /admin/bundle_version
+    `need login`
+    '''
+    with open("./bundle/version", "r") as f:
+        version_info = f.read()
+    return version_info

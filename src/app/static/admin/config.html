@@ -215,6 +215,17 @@
             .space {
                 height: 50px;
             }
+            select{
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                margin-left: 5%;
+                width: 90%;
+                height: 30px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 5px;
+            }
 
             button[disabled] {
                 background-color: #ddd;
@@ -222,6 +233,11 @@
                 cursor: not-allowed;
             }
             input[disabled]{
+                background-color: #ddd;
+                color: grey;
+                cursor: not-allowed;
+            }
+            select[disabled]{
                 background-color: #ddd;
                 color: grey;
                 cursor: not-allowed;
@@ -246,6 +262,9 @@
             <item>
                 <a href="/admin/cfghis">配置修改日志</a>
             </item>
+            <item>
+                <a href="/admin/about">关于</a>
+            <item>
             <item>
                 <a href="/admin/logout">退出登录</a>
             </item>
@@ -425,6 +444,31 @@
                     id="siteURLi"
                     placeholder="URL"
                 />
+                <div class="title2">更新设置</div>
+                <label for="bundleInterval">展馆脚本更新间隔</label>
+                <input
+                    type="number"
+                    name="bundleIntervali"
+                    id="bundleIntervali"
+                    placeholder="单位：毫秒"
+                />
+                <label for="bundleType">展馆脚本更新模式</label>
+                <select name="bundleTypei" id="bundleTypei">
+                    <option value="at_once">立即更新</option>
+                    <option value="manual">手动更新</option>
+                </select>
+                <label for="backendInterval">后端程序更新间隔</label>
+                <input
+                    type="number"
+                    name="backendIntervali"
+                    id="backendIntervali"
+                    placeholder="单位：毫秒"
+                />
+                <label for="backendType">后端程序更新模式</label>
+                <select name="backendTypei" id="backendTypei">
+                    <option value="at_once">立即更新</option>
+                    <option value="manual">手动更新</option>
+                </select>
                 <button id="saveBackend">保存后端配置</button>
             </div>
 
@@ -501,6 +545,10 @@
         }
         function loadPanelConfig(data) {
             document.querySelector("#siteURLi").value = data["site-url"];
+            document.querySelector("#bundleIntervali").value = data["update"]["bundle"]["interval"];
+            document.querySelector("#bundleTypei").value = data["update"]["bundle"]["action"];
+            document.querySelector("#backendIntervali").value = data["update"]["app"]["interval"];
+            document.querySelector("#backendTypei").value = data["update"]["app"]["action"];
         }
         var flag=0;
         function toObject(str){
@@ -535,7 +583,7 @@
                     data.forEach((item, index) => {
                         if (item[0] == viewingID) {
                             viewingConfigID = item[1];
-                            curdata=eval("("+item[2].replace("True","true").replace("False","false").replace("\"","\'")+")");
+                            curdata=eval("("+item[2].replace("True","true").replace("False","false")+")");
                         }
                     });
                     if (viewingConfigID == 0) {
@@ -755,7 +803,6 @@
                     alert("保存成功");
                 });
         };
-        
         document.querySelector("#saveGeneral").onclick = () => {
             let data = {
                 camera: {
@@ -804,6 +851,16 @@
         document.querySelector("#saveBackend").onclick = () => {
             let data = {
                 "site-url": document.querySelector("#siteURLi").value,
+                "update": {
+                    "bundle": {
+                        "interval": parseInt(document.querySelector("#bundleIntervali").value,),
+                        "action": document.querySelector("#bundleTypei").value,
+                    },
+                    "app": {
+                        "interval": parseInt(document.querySelector("#backendIntervali").value),
+                        "action": document.querySelector("#backendTypei").value,
+                    },
+                },
             };
             console.log(data);
             fetch("/panel/config", {
