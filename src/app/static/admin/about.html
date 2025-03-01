@@ -273,6 +273,8 @@
             <div class="line"></div>
             <label for="">后端版本：<span id="ver"></span></label> 
             <label for="">脚本版本：<span id="verb"></span></label> 
+            <label for="">更新状态：<span id="status"></span></label> 
+            <label for="">下次更新检查：<span id="eta"></span> 秒后</label> 
             <button id="checkUpdateBackend">检查后端更新</button>
             <button id="checkUpdateScript">检查脚本更新</button>
             <button id="updateBackend">触发后端更新</button>
@@ -281,17 +283,23 @@
     </body>
     <script>
         document.getElementById("checkUpdateBackend").onclick = function(){
-            fetch("/admin/check_app",{
-                    method: "POST"
-                }).then(res=>res.json()).then(data=>{
-                alert(data.msg);
+            
+            fetch("/admin/update/latest?type=app").then(res=>res.json()).then(data=>{
+                 if (data["status"]==400){
+                    document.getElementById("ver").innerText += "无法获取最新版本";
+                    return
+                }
+                document.getElementById("ver").innerText += data['latest'] ? " 最新版本" : " 需更新";
             });
         }
         document.getElementById("checkUpdateScript").onclick = function(){
-            fetch("/admin/check_bundle",{
-                    method: "POST"
-                }).then(res=>res.json()).then(data=>{
-                alert(data.msg);
+            
+            fetch("/admin/update/latest?type=bundle").then(res=>res.json()).then(data=>{
+                if (data["status"]==400){
+                    document.getElementById("verb").innerText += "无法获取最新版本";
+                    return
+                }
+                document.getElementById("verb").innerText += data['latest'] ? " 最新版本" : " 需更新";
             });
         }
         document.getElementById("updateBackend").onclick = function(){
@@ -302,17 +310,64 @@
             });
         }
         document.getElementById("updateScript").onclick = function(){
-            fetch("/admin/update_bundle",{
+            fetch("/admin/update/update_bundle",{
                     method: "POST"
                 }).then(res=>res.json()).then(data=>{
                 alert(data.msg);
             });
         }
-        fetch("/admin/version").then(res=>res.blob()).then(data=>data.text()).then(data=>{
-            document.getElementById("ver").innerText = data
-        });
-        fetch("/admin/bundle_version").then(res=>res.blob()).then(data=>data.text()).then(data=>{
-            document.getElementById("verb").innerText = data
-        });
+        
+            fetch("/admin/update/eta").then(res=>res.json()).then(data=>{
+                document.getElementById("eta").innerText = data['eta']
+            });
+            fetch("/admin/version").then(res=>res.blob()).then(data=>data.text()).then(data=>{
+                document.getElementById("ver").innerText = data
+            });
+            fetch("/admin/update/bundle_version").then(res=>res.blob()).then(data=>data.text()).then(data=>{
+                document.getElementById("verb").innerText = data
+            });
+            fetch("/admin/update/updating").then(res=>res.json()).then(data=>{
+                status = data['updating'];
+                if(status!="false"){
+                    document.getElementById("status").innerText = "正在更新";
+                    document.getElementById("updateBackend").disabled = true;
+                    document.getElementById("updateScript").disabled = true;
+                    document.getElementById("checkUpdateBackend").disabled = true;
+                    document.getElementById("checkUpdateScript").disabled = true;
+                }else{
+                    document.getElementById("status").innerText = "现在没有更新";
+                    document.getElementById("updateBackend").disabled = false;
+                    document.getElementById("updateScript").disabled = false;
+                    document.getElementById("checkUpdateBackend").disabled = false;
+                    document.getElementById("checkUpdateScript").disabled = false;
+                }
+            });
+        setInterval(()=>{
+            fetch("/admin/update/eta").then(res=>res.json()).then(data=>{
+                document.getElementById("eta").innerText = data['eta']
+            });
+            fetch("/admin/version").then(res=>res.blob()).then(data=>data.text()).then(data=>{
+                document.getElementById("ver").innerText = data
+            });
+            fetch("/admin/update/bundle_version").then(res=>res.blob()).then(data=>data.text()).then(data=>{
+                document.getElementById("verb").innerText = data
+            });
+            fetch("/admin/update/updating").then(res=>res.json()).then(data=>{
+                status = data['updating'];
+                if(status!="false"){
+                    document.getElementById("status").innerText = "正在更新";
+                    document.getElementById("updateBackend").disabled = true;
+                    document.getElementById("updateScript").disabled = true;
+                    document.getElementById("checkUpdateBackend").disabled = true;
+                    document.getElementById("checkUpdateScript").disabled = true;
+                }else{
+                    document.getElementById("status").innerText = "现在没有更新";
+                    document.getElementById("updateBackend").disabled = false;
+                    document.getElementById("updateScript").disabled = false;
+                    document.getElementById("checkUpdateBackend").disabled = false;
+                    document.getElementById("checkUpdateScript").disabled = false;
+                }
+            });
+        }, 10000);
     </script>
 </html>

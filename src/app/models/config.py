@@ -225,5 +225,5 @@ generalconfig = Config("./configs/general.json", 1, {
 )
 
 panelconfig = Config("./configs/panel.json", 2, {"site-url": "http://localhost:5002", "update": {
-                     "bundle": {"action": "at_once", "interval": 300000}, "app": {"action": "at_once", "interval": 300000}}})
+                     "bundle": {"action": "at_once"}, "app": {"action": "at_once"}, "interval": 300000}})
 

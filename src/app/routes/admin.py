@@ -176,9 +176,10 @@ def update():
     `need login`
     '''
     q=atp.update_self()
-    return jsonify({"status":200, "msg":"success"+(" no new version" if q==1 else "")})
+    return jsonify({"status":200, "msg":("success"+(" no new version" if q==1 else "")) if q!=-1 else "无法获取最新版本"})
 
-@blueprint.route("/admin/update_bundle", methods=["POST"])
+
+@blueprint.route("/admin/update/update_bundle", methods=["POST"])
 @auth.login_required
 def update_bundle():
     '''
@@ -187,9 +188,10 @@ def update_bundle():
     `need login`
     '''
     q=atp.update_bundle()
-    return jsonify({"status": 200, "msg": "success"+(" no new version" if q == 1 else "")})
+    return jsonify({"status": 200, "msg": ("success"+(" no new version" if q == 1 else "")) if q != -1 else "无法获取最新版本"})
 
-@blueprint.route("/admin/check_bundle", methods=["POST"])
+
+@blueprint.route("/admin/update/check_bundle", methods=["POST"])
 @auth.login_required
 def check_bundle():
     '''
@@ -202,7 +204,8 @@ def check_bundle():
         return jsonify({"status":200, "msg":"new version available"})
     return jsonify({"status":200, "msg":"no new version"})
 
-@blueprint.route("/admin/check_app", methods=["POST"])
+
+@blueprint.route("/admin/update/check_app", methods=["POST"])
 @auth.login_required
 def check_app():
     '''
@@ -215,7 +218,7 @@ def check_app():
         return jsonify({"status":200, "msg":"new version available"})
     return jsonify({"status":200, "msg":"no new version"})
 
-@blueprint.route("/admin/bundle_version", methods=["GET"])
+@blueprint.route("/admin/update/bundle_version", methods=["GET"])
 @auth.login_required
 def bundle_version():
     '''
@@ -226,3 +229,44 @@ def bundle_version():
     with open("./bundle/version", "r") as f:
         version_info = f.read()
     return version_info
+
+
+@blueprint.route("/admin/update/eta", methods=["GET"])
+@auth.login_required
+def eta():
+    '''
+    获取eta
+    GET /admin/eta
+    `need login`
+    '''
+    return jsonify({"status":200, "eta":atp.eta})
+
+@blueprint.route("/admin/update/updating", methods=["GET"])
+@auth.login_required
+def updating():
+    '''
+    获取更新状态
+    GET /admin/updating
+    `need login`
+    '''
+    return jsonify({"status":200, "updating":atp.updating})
+
+@blueprint.route("/admin/update/latest", methods=["GET"])
+@auth.login_required
+def newer():
+    '''
+    获取新版本
+    GET /admin/latest
+    `need login`
+    '''
+    type=request.args.get("type")
+    if type=="app":
+        res = atp.get_latest_release_download_url_tag(repo_name="9ding-backend", file_name="app.zip")
+        if res=="Failed to retrieve the latest release":
+            return jsonify({"status":400, "msg":"Failed to retrieve the latest release"})
+        return jsonify({"status":200, "latest":not atp.checkifnewversion(res[1], ver.v)})
+    elif type=="bundle":
+        res = atp.get_latest_release_download_url_tag()
+        if res == "Failed to retrieve the latest release":
+            return jsonify({"status": 400, "msg": "Failed to retrieve the latest release"})
+        return jsonify({"status": 200, "latest":not atp.checkifnewversion(res[1])})

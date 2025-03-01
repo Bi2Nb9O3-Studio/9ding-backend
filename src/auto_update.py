@@ -1,14 +1,22 @@
+from asyncio import Lock
 import os
 import shutil
 import subprocess
 import sys
+import threading
+import time
+from turtle import up
 import zipfile
 import requests
 from tqdm import tqdm
+from app.models import config
 from app.version import v
 
 fifofile=""
 
+updating=False
+update_lock=threading.Lock()
+eta=0
 
 def trigger_uwsgi_reload():
     with open(fifofile, 'w') as fifo:
@@ -25,7 +33,8 @@ def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name=
                 return asset['browser_download_url'], release_info['tag_name']
     else:
         # print(response.text)
-        print("Failed to retrieve the latest release")
+        print("Failed to retrieve the latest release",response.text)
+        return "Failed to retrieve the latest release"
 
 
 def download_file(url: str, fname: str, github: bool = True):
@@ -72,8 +81,12 @@ def checkifnewversion(tag,current=None):
 
 
 def update_bundle():
-    url, tag = get_latest_release_download_url_tag()
+    res = get_latest_release_download_url_tag()
     os.makedirs("./bundle/", exist_ok=True)
+    if res == "Failed to retrieve the latest release":
+        print("Failed to retrieve the latest release")
+        return -1
+    url,tag=res
     if checkifnewversion(tag):
         download_file(url, "./bundle/bundle.js")
         with open("./bundle/version", mode="w") as f:
@@ -96,7 +109,11 @@ def download_font():
     print("Font downloaded")
 
 def update_self():
-    url, tag = get_latest_release_download_url_tag(repo_name="9ding-backend",file_name="app.zip")
+    res = get_latest_release_download_url_tag(repo_name="9ding-backend",file_name="app.zip")
+    if res == "Failed to retrieve the latest release":
+        print("Failed to retrieve the latest release")
+        return -1
+    url,tag=res
     if checkifnewversion(tag,v):
         os.makedirs("./tmp2", exist_ok=True)
         download_file(url, "./tmp2/app.zip")
@@ -124,3 +141,30 @@ def update_self():
     else:
         print("Self is up to date")
         return 1
+
+def do():
+    global updating
+    global eta
+    eta=60
+    updating=False
+    while True:
+        for _ in range(60):
+            time.sleep(1)
+            eta-=1
+        do_once()
+        eta=60
+
+
+def do_once():
+    global updating, update_lock
+    print("Checking for updates")
+    if updating:
+        return
+    updating = True
+    update_lock.acquire()
+    if config.panelconfig["update"]["bundle"]["action"] == "at_once":
+        update_bundle()
+    if config.panelconfig["update"]["app"]["action"] == "at_once":
+        update_self()
+    updating = False
+    update_lock.release()
