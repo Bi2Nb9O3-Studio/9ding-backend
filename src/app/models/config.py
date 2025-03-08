@@ -20,6 +20,15 @@ class Config():
 
         with open(self.path, "r") as f:
             self.data = json.loads(f.read())
+        # #recursively update the default config
+        def update(d, u):
+            for k, v in u.items():
+                if isinstance(v, dict):
+                    d[k] = update(d.get(k, {}), v)
+                else:
+                    d[k] = v
+            return d
+        self.data = update(self.data, init)
         self.lock = threading.Lock()
 
     def __getitem__(self, index):
