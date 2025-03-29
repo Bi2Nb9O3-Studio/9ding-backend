@@ -5,7 +5,6 @@ import subprocess
 import sys
 import threading
 import time
-from turtle import up
 import zipfile
 import requests
 from tqdm import tqdm
@@ -17,6 +16,7 @@ fifofile=""
 updating=False
 update_lock=threading.Lock()
 eta=0
+_thread==None
 
 def trigger_uwsgi_reload():
     with open(fifofile, 'w') as fifo:
@@ -160,11 +160,17 @@ def do_once():
     print("Checking for updates")
     if updating:
         return
-    updating = True
-    update_lock.acquire()
-    if config.panelconfig["update"]["bundle"]["action"] == "at_once":
-        update_bundle()
-    if config.panelconfig["update"]["app"]["action"] == "at_once":
-        update_self()
-    updating = False
-    update_lock.release()
+    with update_lock:
+        updating = True
+        if config.panelconfig["update"]["bundle"]["action"] == "at_once":
+            update_bundle()
+        if config.panelconfig["update"]["app"]["action"] == "at_once":
+            update_self()
+        updating = False
+
+
+def start_thread():
+    global _thread
+    if not _thread or not _thread.is_alive():
+        _thread = threading.Thread(target=do, daemon=True)
+        _thread.start()

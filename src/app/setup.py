@@ -1,6 +1,7 @@
 from flask import Flask, make_response
 from . import routes
 import app.models.config as config
+from ..auto_update import start_thread
 
 def create_app():
     app = Flask(__name__)
@@ -20,4 +21,6 @@ def create_app():
         resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE'
         resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
         return resp
+    with app.app_context():
+        start_thread()
     return app
