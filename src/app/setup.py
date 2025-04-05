@@ -1,7 +1,7 @@
 from flask import Flask, make_response
 from . import routes
 import app.models.config as config
-from ..auto_update import start_thread
+from auto_update import start_thread
 
 def create_app():
     app = Flask(__name__)

@@ -16,7 +16,7 @@ fifofile=""
 updating=False
 update_lock=threading.Lock()
 eta=0
-_thread==None
+_thread=None
 
 def trigger_uwsgi_reload():
     with open(fifofile, 'w') as fifo:
