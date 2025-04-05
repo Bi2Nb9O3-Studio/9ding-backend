@@ -5,6 +5,7 @@
 - run `init.py`
 - **replace `key`,`salt`,`fifofile` with your own.**
 - add configs in uwsgi config:
+- you may need to run it as root(in order to automatically update,you can also choose to install packages nanually) **TODO**
 
 ```config
 master-fifo=your/path/to/fifo/file

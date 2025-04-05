@@ -175,7 +175,11 @@ def update():
     POST /admin/update
     `need login`
     '''
-    q=atp.update_self()
+    atp.updating = True
+    with atp.update_lock:
+        atp.updating = True
+        q=atp.update_self()
+        atp.updating = False
     return jsonify({"status":200, "msg":("success"+(" no new version" if q==1 else "")) if q!=-1 else "无法获取最新版本"})
 
 
@@ -187,7 +191,11 @@ def update_bundle():
     POST /admin/update_bundle
     `need login`
     '''
-    q=atp.update_bundle()
+    atp.updating = True
+    with atp.update_lock:
+        atp.updating = True
+        q = atp.update_bundle()
+        atp.updating = False
     return jsonify({"status": 200, "msg": ("success"+(" no new version" if q == 1 else "")) if q != -1 else "无法获取最新版本"})
 
 

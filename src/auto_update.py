@@ -1,5 +1,6 @@
 from asyncio import Lock
 import os
+from pathlib import Path
 import shutil
 import subprocess
 import sys
@@ -11,16 +12,18 @@ from tqdm import tqdm
 from app.models import config
 from app.version import v
 
-fifofile=""
+fifofile = ""
 
-updating=False
-update_lock=threading.Lock()
-eta=0
-_thread=None
+updating = False
+update_lock = threading.Lock()
+eta = 0
+_thread = None
+
 
 def trigger_uwsgi_reload():
     with open(fifofile, 'w') as fifo:
         fifo.write('r')
+
 
 def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name='9ding-js', file_name="bundle.js"):
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
@@ -33,7 +36,7 @@ def get_latest_release_download_url_tag(repo_owner='bi2nb9o3-studio', repo_name=
                 return asset['browser_download_url'], release_info['tag_name']
     else:
         # print(response.text)
-        print("Failed to retrieve the latest release",response.text)
+        print("Failed to retrieve the latest release", response.text)
         return "Failed to retrieve the latest release"
 
 
@@ -69,15 +72,15 @@ def compare_version(a, b):
     return 0
 
 
-def checkifnewversion(tag,current=None):
+def checkifnewversion(tag, current=None):
     if current is None:
         if os.path.exists("./bundle/version"):
             with open("./bundle/version", mode="r") as f:
-                return compare_version(tag,f.read())
+                return compare_version(tag, f.read())
         else:
             return 1
     else:
-        return compare_version(tag,current)
+        return compare_version(tag, current)
 
 
 def update_bundle():
@@ -86,7 +89,7 @@ def update_bundle():
     if res == "Failed to retrieve the latest release":
         print("Failed to retrieve the latest release")
         return -1
-    url,tag=res
+    url, tag = res
     if checkifnewversion(tag):
         download_file(url, "./bundle/bundle.js")
         with open("./bundle/version", mode="w") as f:
@@ -108,16 +111,50 @@ def download_font():
     shutil.rmtree("./tmp", ignore_errors=True)
     print("Font downloaded")
 
+
+def update_dependencies():
+    # 获取虚拟环境二进制路径
+    venv_python = sys.executable
+    venv_bin_dir = os.path.dirname(venv_python)
+    venv_python = os.path.join(os.path.dirname(venv_python),"pip")
+
+    # 设置虚拟环境专属缓存目录
+    venv_cache_dir = str(Path(venv_bin_dir).parent / "pip_cache")
+    os.makedirs("venv_cache_dir",exist_ok=True, mode=0o755)
+    print("venv python:", venv_python)
+    try:
+        # 生成旧依赖列表（不使用shell重定向）
+        with open("old_requirements.txt", "w") as f:
+            subprocess.check_call(
+                [venv_python, "freeze"],
+                stdout=f,
+                env={**os.environ, "PIP_CACHE_DIR": venv_cache_dir,
+                     "PYTHONHOME": "", }  # 关键环境变量设置
+            )
+
+        # 执行安装（使用虚拟环境专属缓存）
+        subprocess.check_call([
+            'sudo',
+            venv_python, "install",
+            "--upgrade",
+            "--no-cache-dir",  # 可选：完全禁用缓存
+            "-r", "./tmp2/requirements.txt"
+        ], env={**os.environ, "PIP_CACHE_DIR": venv_cache_dir, "PYTHONHOME": ""})
+
+    except subprocess.CalledProcessError as e:
+        print(f"更新失败，错误码 {e.returncode}")
+
 def update_self():
-    res = get_latest_release_download_url_tag(repo_name="9ding-backend",file_name="app.zip")
+    res = get_latest_release_download_url_tag(
+        repo_name="9ding-backend", file_name="app.zip")
     if res == "Failed to retrieve the latest release":
         print("Failed to retrieve the latest release")
         return -1
-    url,tag=res
-    if checkifnewversion(tag,v):
+    url, tag = res
+    if checkifnewversion(tag, v):
         os.makedirs("./tmp2", exist_ok=True)
         download_file(url, "./tmp2/app.zip")
-        #Strucutre of app.zip:
+        # Strucutre of app.zip:
         # - app.zip
         #   - src
         #     - app
@@ -129,11 +166,10 @@ def update_self():
         for root, dirs, files in os.walk("./tmp2/src"):
             for file in files:
                 os.makedirs(os.path.join(".", root[11:]), exist_ok=True)
-                shutil.copy(os.path.join(root, file), os.path.join(".", root[11:],file))
+                shutil.copy(os.path.join(root, file),
+                            os.path.join(".", root[11:], file))
         # 安装新的依赖
-        subprocess.check_call([sys.executable, "-m", "pip", "freeze", ">", "old_requirements.txt"])
-        subprocess.check_call([sys.executable, "-m", "pip", "install",
-                              "--upgrade", "--force-reinstall", "-r", "./tmp2/requirements.txt"])
+        update_dependencies()
         print("Self updated")
         shutil.rmtree("./tmp2", ignore_errors=True)
         trigger_uwsgi_reload()
@@ -142,17 +178,18 @@ def update_self():
         print("Self is up to date")
         return 1
 
+
 def do():
     global updating
     global eta
-    eta=60
-    updating=False
+    eta = 60
+    updating = False
     while True:
         for _ in range(60):
             time.sleep(1)
-            eta-=1
+            eta -= 1
         do_once()
-        eta=60
+        eta = 60
 
 
 def do_once():
