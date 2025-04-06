@@ -44,6 +44,5 @@ class Database():
             )
 
 
-os.makedirs("./database/", exist_ok=True)
 db = Database("./database.db")
 db.init()

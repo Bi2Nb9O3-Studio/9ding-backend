@@ -1,4 +1,5 @@
 from asyncio import Lock
+import json
 import os
 from pathlib import Path
 import shutil
@@ -12,16 +13,25 @@ from tqdm import tqdm
 from app.models import config
 from app.version import v
 
-fifofile = ""
 
 updating = False
 update_lock = threading.Lock()
 eta = 0
 _thread = None
-
+if not os.path.exists("./atp.cfg") and not os.path.isfile("./atp.cfg"):
+    with open("./atp.cfg", "w") as f:
+        f.write(json.dumps({
+            "fifo": "path/to/your/dir",
+            "envmode": "venv"  # venv/bt #TODO: conda
+        }))
+    print("Config file created, please edit it to set your preferences.")
+    sys.exit(0)
+def get_atp_config():
+    with open("./atp.cfg", "r") as f:
+        return json.loads(f.read())
 
 def trigger_uwsgi_reload():
-    with open(fifofile, 'w') as fifo:
+    with open(get_atp_config()["fifo"], 'w') as fifo:
         fifo.write('r')
 
 
@@ -114,31 +124,40 @@ def download_font():
 
 def update_dependencies():
     # 获取虚拟环境二进制路径
-    venv_python = sys.executable
-    venv_bin_dir = os.path.dirname(venv_python)
-    venv_python = os.path.join(os.path.dirname(venv_python),"pip")
+    venv_pip = sys.executable
+    venv_bin_dir = os.path.dirname(venv_pip)
+    venv_pip = os.path.join(os.path.dirname(venv_pip),"pip")
+    venv_activate = os.path.join(venv_bin_dir, "activate")
 
     # 设置虚拟环境专属缓存目录
     venv_cache_dir = str(Path(venv_bin_dir).parent / "pip_cache")
     os.makedirs("venv_cache_dir",exist_ok=True, mode=0o755)
-    print("venv python:", venv_python)
+    print("venv python:", venv_pip)
     try:
         # 生成旧依赖列表（不使用shell重定向）
-        with open("old_requirements.txt", "w") as f:
-            subprocess.check_call(
-                [venv_python, "freeze"],
-                stdout=f,
-                env={**os.environ, "PIP_CACHE_DIR": venv_cache_dir,
-                     "PYTHONHOME": "", }  # 关键环境变量设置
-            )
+        # with open("old_requirements.txt", "w") as f:
+        #     subprocess.check_call(
+        #         [venv_pip, "freeze"],
+        #         stdout=f,
+        #         env={**os.environ, "PIP_CACHE_DIR": venv_cache_dir,
+        #              "PYTHONHOME": "", }  # 关键环境变量设置
+        #     )
 
         # 执行安装（使用虚拟环境专属缓存）
+        activate_venv = f"source {venv_activate}"
+        if get_atp_config()["envmode"] == "bt":
+            activate_venv = f"source py-project-env {venv_bin_dir.split('_venv/bin')[0].split('/www/server/pyporject_evn/')[1]}"
         subprocess.check_call([
-            'sudo',
-            venv_python, "install",
-            "--upgrade",
-            "--no-cache-dir",  # 可选：完全禁用缓存
-            "-r", "./tmp2/requirements.txt"
+            "/bin/bash", "-c",
+            f'''
+            set -e
+            {activate_venv}
+            pip freeze > ./old_requirements.txt
+            pip install --upgrade --no-cache-dir -r ./old_requirements.txt
+            '''
+            # "--upgrade",
+            # "--no-cache-dir",  # 可选：完全禁用缓存
+            # "-r", "./tmp2/requirements.txt"
         ], env={**os.environ, "PIP_CACHE_DIR": venv_cache_dir, "PYTHONHOME": ""})
 
     except subprocess.CalledProcessError as e:
@@ -182,14 +201,15 @@ def update_self():
 def do():
     global updating
     global eta
-    eta = 60
+    delay = int(config.panelconfig["update"]["interval"])/1000
+    eta = delay
     updating = False
     while True:
-        for _ in range(60):
+        for _ in range(delay):
             time.sleep(1)
             eta -= 1
         do_once()
-        eta = 60
+        eta = delay
 
 
 def do_once():
