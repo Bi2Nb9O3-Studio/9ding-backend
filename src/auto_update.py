@@ -201,13 +201,17 @@ def update_self():
 def do():
     global updating
     global eta
-    delay = int(config.panelconfig["update"]["interval"])/1000
+    delay = int(int(config.panelconfig["update"]["interval"])//1000)
     eta = delay
     updating = False
+    counter=0
     while True:
-        for _ in range(delay):
-            time.sleep(1)
-            eta -= 1
+        for _ in range(delay*1000):
+            time.sleep(0.001)
+            counter+=1
+            if counter  == 1000:
+                counter=0
+                eta-=1
         do_once()
         eta = delay
 
