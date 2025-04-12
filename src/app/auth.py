@@ -1,5 +1,6 @@
 from hashlib import sha256
 from functools import wraps
+import os
 import random
 import re
 import time
@@ -7,12 +8,12 @@ from typing import Tuple
 import flask
 from app import utils
 import app.models.database as database
-import os
-import base64
 import json
 
-salt = "d39d977837414790d42ecd351f59da887d7c41f1a62b5463475bf1c6dc1bd556"
-
+# salt = "d39d977837414790d42ecd351f59da887d7c41f1a62b5463475bf1c6dc1bd556"
+#read salt from `security.cfg`, formation:json key:salt.
+with open("./security.cfg", "r", encoding="utf-8") as f:
+    salt = json.loads(f.read())["salt"]
 def verify_password(username: str, password: str) -> Tuple[bool, str]:
     # get the password of user
     with database.db.connect() as (con, cur):

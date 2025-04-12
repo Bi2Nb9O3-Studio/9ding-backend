@@ -1,4 +1,5 @@
 from binascii import b2a_hex, a2b_hex
+import json
 from Crypto.Cipher import AES
 import base64
 from PIL import Image
@@ -41,10 +42,9 @@ def watermarkimg(img, txt) -> PIL.Image.Image:
 
 # encrypt
 
-"""
-ECB没有偏移量
-"""
-key ='WnjdH1xTxVBpHMezzIRhPEbbxmxtIYvr'.encode('utf-8')
+# key ='WnjdH1xTxVBpHMezzIRhPEbbxmxtIYvr'.encode('utf-8')
+with open("./security.cfg", "r", encoding="utf-8") as f:
+    key = json.loads(f.read())["key"].encode('utf-8')
 
 def add_to_16(text):
     if len(text.encode('utf-8')) % 16:
