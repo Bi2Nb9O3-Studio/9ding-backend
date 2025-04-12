@@ -1,3 +1,5 @@
+import hashlib
+import json
 import sqlite3
 import os
 import threading
@@ -39,8 +41,11 @@ class Database():
                 "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
             )
             #insert default user if note exists
+            with open("./security.cfg", "r", encoding="utf-8") as f:
+                salt = json.loads(f.read())["salt"]
+            
             cur.execute(
-                f"INSERT OR IGNORE INTO users values (1, 'admin', 'e60da41b2603a837ac93532e4cc11a68f99b8209e8fdd5b7643a9ebc5028784e')"
+                f"INSERT OR IGNORE INTO users values (1, 'admin', '{hashlib.sha256((salt+"admin").encode()).hexdigest()}')"
             )
 
 
