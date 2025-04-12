@@ -45,7 +45,7 @@ class Database():
                 salt = json.loads(f.read())["salt"]
             
             cur.execute(
-                f"INSERT OR IGNORE INTO users values (1, 'admin', '{hashlib.sha256((salt+"admin").encode()).hexdigest()}')"
+                f"INSERT OR IGNORE INTO users values (1, 'admin', '{hashlib.sha256((salt+'admin').encode()).hexdigest()}')"
             )
 
 
